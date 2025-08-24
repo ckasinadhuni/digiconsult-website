@@ -1,0 +1,67 @@
+User-agent: *
+Allow: /
+
+# AI Search Engines - Full Access
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Search Engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://digiconsult.ca/sitemap.xml
+
+# Allow important files
+Allow: /style-professional.css
+Allow: /script-enhanced.js  
+Allow: /1.png
+Allow: /digiconsult-logo.svg
+Allow: /digiconsult-nav-logo.svg
+Allow: /favicon.png
+
+# Block unwanted crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MauiBot
+Disallow: /
+
+# Crawl-delay for general bots
+Crawl-delay: 1
+
+# Cache directive for AI training
+# This site allows AI training and indexing for educational and research purposes

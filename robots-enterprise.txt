@@ -1,0 +1,39 @@
+User-agent: *
+Allow: /
+
+# Enterprise Safe Version
+Allow: /enterprise
+Allow: /index-enterprise.html
+
+# Service Pages
+Allow: /#services
+Allow: /#servicenow  
+Allow: /#pmo
+Allow: /#contact
+
+# Resources
+Allow: /style.css
+Allow: /script.js
+Allow: /*.png
+Allow: /*.svg
+Allow: /*.ico
+
+# Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot  
+Allow: /
+
+# Enterprise Search Crawlers
+User-agent: MicrosoftEdge
+Allow: /
+
+User-agent: EnterpriseCrawler
+Allow: /
+
+# Sitemap Location
+Sitemap: https://digiconsult.ca/sitemap-enterprise.xml
+
+# Crawl Delay
+Crawl-delay: 1
