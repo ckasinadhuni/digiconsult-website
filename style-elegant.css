@@ -46,8 +46,8 @@
     --space-2xl: 2rem;        /* 32px */
     --space-3xl: 3rem;        /* 48px */
     --space-4xl: 4rem;        /* 64px */
-    --space-5xl: 6rem;        /* 96px */
-    --space-6xl: 8rem;        /* 128px */
+    --space-5xl: 1.5rem;      /* 24px */
+    --space-6xl: 2rem;        /* 32px */
     
     /* Border Radius Scale */
     --radius-none: 0;
@@ -193,9 +193,37 @@ body {
 }
 
 .nav-brand img {
-    height: 32px;
+    height: 60px;
     width: auto;
+    max-width: 250px;
     transition: all 0.3s var(--ease-elegant);
+}
+
+.brand-text {
+    font-size: 1.75rem;
+    font-weight: var(--weight-bold);
+    color: var(--brand-red);
+    margin-left: var(--space-md);
+    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: var(--pearl);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--pearl-dark);
+}
+
+.breadcrumb-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.breadcrumb span {
+    font-size: 14px;
+    color: var(--slate-medium);
 }
 
 .nav-menu {
@@ -237,6 +265,11 @@ body {
 .nav-link:hover::before,
 .nav-link.active::before {
     transform: scaleX(1);
+}
+
+.nav-link.active {
+    color: var(--brand-red);
+    font-weight: var(--weight-semibold);
 }
 
 .nav-cta {
@@ -365,17 +398,9 @@ body {
 }
 
 .hero-title .gradient-text {
-    background: linear-gradient(135deg, var(--brand-red), var(--gold), var(--teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradient-shift 8s ease-in-out infinite;
+    color: var(--brand-red);
 }
 
-@keyframes gradient-shift {
-    0%, 100% { filter: hue-rotate(0deg); }
-    50% { filter: hue-rotate(20deg); }
-}
 
 .hero-description {
     color: var(--slate-medium);
@@ -631,42 +656,28 @@ body {
 }
 
 .interactive-service-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--space-3xl);
-    margin-bottom: var(--space-5xl);
+    display: block;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
 }
 
 .service-showcase-card {
-    background: var(--pure-white);
-    border-radius: var(--radius-2xl);
-    padding: var(--space-3xl);
-    box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(26, 29, 41, 0.06);
-    transition: all 0.4s var(--ease-spring);
-    position: relative;
-    overflow: hidden;
-}
-
-.service-showcase-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--brand-red), var(--gold), var(--teal));
-    transform: translateX(-100%);
-    transition: transform 0.6s var(--ease-elegant);
-}
-
-.service-showcase-card:hover::before {
-    transform: translateX(0);
-}
-
-.service-showcase-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-elegant);
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 30px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e2e8f0 !important;
+    position: relative !important;
+    margin-bottom: 30px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 1000px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .service-header {
@@ -680,17 +691,12 @@ body {
     width: 60px;
     height: 60px;
     border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, var(--brand-red), var(--brand-red-hover));
+    background: var(--brand-red);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--pure-white);
     font-size: 1.5rem;
-    transition: all 0.3s var(--ease-spring);
-}
-
-.service-showcase-card:hover .service-icon-large {
-    transform: scale(1.1) rotate(5deg);
 }
 
 .service-meta {
@@ -1098,7 +1104,8 @@ body {
     }
     
     .interactive-service-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-xl);
     }
 }
 
@@ -1175,7 +1182,15 @@ body {
     }
     
     .service-showcase-card {
-        padding: var(--space-2xl);
+        padding: var(--space-xl);
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .interactive-service-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
     }
     
     .contact-form {
