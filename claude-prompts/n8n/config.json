@@ -1,0 +1,11 @@
+{
+  "api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMWMwNjc5YS1mYzNlLTRjMTgtYWMwMC1jNGFmMzU2OThjNWMiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzU1NjcwMzM3LCJleHAiOjE3NTgyNTQ0MDB9.QxTuviUL908xrYFM1ehiehjDfxuEDH-6AQe0CsryNy8",
+  "base_url": "http://localhost:5678",
+  "webhook_base": "https://n8n.digiconsult.ca",
+  "telegram_bot_token": "8086479517:AAE_DeO4WJMxHuhUvAKvCKhaTtDtm8R1nfY",
+  "local_services": {
+    "whisper": "http://localhost:8000",
+    "ollama": "http://localhost:11434"
+  },
+  "cache_duration": 300
+}

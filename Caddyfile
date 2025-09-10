@@ -1,0 +1,239 @@
+digiconsult.ca {
+    root * /home/ubuntu/website
+    file_server
+    
+    # Authentication endpoint for JavaScript to check auth status
+    route /api/auth/* {
+        forward_auth authelia:9091 {
+            uri /api/verify
+            copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+        
+        # Return user info if authenticated
+        respond /api/auth/check "OK"
+        
+        # Return user details as JSON
+        header /api/auth/user Content-Type "application/json"
+        respond /api/auth/user `{
+            "email": "{http.request.header.Remote-User}",
+            "displayName": "{http.request.header.Remote-Name}",
+            "groups": "{http.request.header.Remote-Groups}"
+        }`
+    }
+    
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+    
+    # Cache static assets
+    @static {
+        file
+        path *.css *.js *.ico *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2
+    }
+    header @static Cache-Control "public, max-age=31536000"
+    
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Authelia authentication portal
+auth.digiconsult.ca {
+    reverse_proxy authelia:9091
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# PocketBase authentication service (NEW - PARALLEL SETUP)
+auth2.digiconsult.ca {
+    reverse_proxy digiconsult-pocketbase-auth:8090 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# n8n - BYPASS Authelia (has its own authentication)
+n8n.digiconsult.ca {
+    reverse_proxy n8n:5678 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Qdrant Dashboard - PROTECTED (Analysts + Admins)
+qdrant.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    # Redirect root to dashboard
+    redir / /dashboard
+    
+    reverse_proxy qdrant:6333
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Enhanced Qdrant Collection Manager - PROTECTED (Analysts + Admins)
+qdrant-admin.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy qdrant-manager:80 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Faster-Whisper API - PROTECTED (All authenticated users)
+faster-whisper.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy faster-whisper:8000
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Whisper Web UI - PROTECTED (All authenticated users)
+whisper.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy whisper-webui:8004 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Ollama Chat - PROTECTED (Developers + Admins)
+ollama.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy open-webui:8080 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# PostgreSQL Admin - PROTECTED (Admin only)
+postgresql.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy pgadmin4:80 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# Authelia Admin UI - PROTECTED (Admin only)
+admin.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy authelia-admin:3001 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Remote-User {http.request.header.Remote-User}
+        header_up X-Remote-Groups {http.request.header.Remote-Groups}
+        header_up X-Remote-Name {http.request.header.Remote-Name}
+        header_up X-Remote-Email {http.request.header.Remote-Email}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+
+# OCR Service - PROTECTED (All authenticated users)
+ocr.digiconsult.ca {
+    # Forward authentication to Authelia
+    forward_auth authelia:9091 {
+        uri /api/verify?rd=https://auth.digiconsult.ca/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+    }
+    
+    reverse_proxy tesseract-ocr:8003 {
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    log {
+        output stdout
+        level INFO
+    }
+}
+

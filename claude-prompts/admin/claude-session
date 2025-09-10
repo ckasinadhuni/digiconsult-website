@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Claude Session Management Utility
+# Usage: claude-session [start|end|status|current]
+
+ADMIN_DIR="/home/ubuntu/claude-prompts/admin"
+CURRENT_SESSION_FILE="$ADMIN_DIR/.current-session"
+
+case "${1:-status}" in
+    start)
+        echo "Starting new Claude session..."
+        "$ADMIN_DIR/auto-session.sh"
+        ;;
+    end)
+        echo "Ending current Claude session..."
+        "$ADMIN_DIR/session-end.sh"
+        ;;
+    status)
+        if [ -f "$CURRENT_SESSION_FILE" ]; then
+            SESSION_ID=$(cat "$CURRENT_SESSION_FILE")
+            SESSION_FILE="$ADMIN_DIR/session-$SESSION_ID.md"
+            echo "✓ Active session: $SESSION_ID"
+            echo "✓ Session file: $SESSION_FILE"
+            if [ -f "$SESSION_FILE" ]; then
+                START_TIME=$(grep "Started at:" "$SESSION_FILE" | cut -d' ' -f4-5)
+                echo "✓ Started: $START_TIME"
+            fi
+        else
+            echo "✗ No active session"
+        fi
+        ;;
+    current)
+        if [ -f "$CURRENT_SESSION_FILE" ]; then
+            SESSION_ID=$(cat "$CURRENT_SESSION_FILE")
+            SESSION_FILE="$ADMIN_DIR/session-$SESSION_ID.md"
+            if [ -f "$SESSION_FILE" ]; then
+                echo "Current session file: $SESSION_FILE"
+                cat "$SESSION_FILE"
+            else
+                echo "Session file not found"
+            fi
+        else
+            echo "No active session"
+        fi
+        ;;
+    *)
+        echo "Usage: claude-session [start|end|status|current]"
+        echo ""
+        echo "Commands:"
+        echo "  start   - Start a new session"
+        echo "  end     - End current session"
+        echo "  status  - Show session status"
+        echo "  current - Show current session content"
+        ;;
+esac

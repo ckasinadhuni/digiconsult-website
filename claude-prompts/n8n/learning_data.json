@@ -1,0 +1,122 @@
+{
+  "error_patterns": {
+    "api_endpoint_assumption": [
+      {
+        "pattern": "Using /api/v1/node-types instead of /types/nodes.json",
+        "impact": "high",
+        "fix": "Always validate API endpoints before use",
+        "prevention": "Check n8n docs or test endpoint first",
+        "learned_on": "2025-08-20T06:52:02.681491"
+      }
+    ],
+    "node_version_mismatch": [
+      {
+        "pattern": "Assuming @n8n/n8n-nodes-base.telegramTrigger format instead of n8n-nodes-base.telegramTrigger",
+        "impact": "high",
+        "fix": "Use exact node names from /types/nodes.json endpoint",
+        "prevention": "Always validate node types before workflow creation",
+        "learned_on": "2025-08-20T06:52:02.681502"
+      }
+    ],
+    "langchain_availability_assumption": [
+      {
+        "pattern": "Concluded LangChain nodes unavailable without proper validation",
+        "impact": "critical",
+        "fix": "Proper endpoint validation revealed 103 LangChain nodes available",
+        "prevention": "Never assume node availability - always validate",
+        "learned_on": "2025-08-20T06:52:02.681505"
+      }
+    ],
+    "docker_compose_compatibility": [
+      {
+        "pattern": "docker-compose 1.29.2 incompatible with Docker 27.5.1 causing ContainerConfig errors",
+        "impact": "high",
+        "fix": "Use direct docker commands or upgrade docker-compose",
+        "prevention": "Check version compatibility before container operations",
+        "learned_on": "2025-08-20T06:52:02.681507"
+      }
+    ],
+    "custom_generator_complexity": [
+      {
+        "pattern": "Building complex Python generators instead of using proven community templates",
+        "impact": "medium",
+        "fix": "Switch to n8n community template approach",
+        "prevention": "Research existing solutions before building from scratch",
+        "learned_on": "2025-08-20T06:52:02.681513"
+      }
+    ]
+  },
+  "success_patterns": {
+    "proper_api_validation": [
+      {
+        "pattern": "Using /types/nodes.json endpoint successfully retrieved 794 node types",
+        "impact": "high",
+        "replication": "Always use this endpoint for node validation",
+        "learned_on": "2025-08-20T06:52:02.681515"
+      }
+    ],
+    "template_validator_approach": [
+      {
+        "pattern": "Created template_validator.py that prevents node compatibility issues",
+        "impact": "critical",
+        "replication": "Use validator before every workflow deployment",
+        "learned_on": "2025-08-20T06:52:02.681517"
+      }
+    ],
+    "langchain_discovery": [
+      {
+        "pattern": "Found 103 LangChain nodes available, deployed working AI agent",
+        "impact": "critical",
+        "replication": "LangChain nodes work in n8nio/n8n:latest 1.107.3",
+        "learned_on": "2025-08-20T06:52:02.681519"
+      }
+    ],
+    "safe_docker_update": [
+      {
+        "pattern": "Successfully updated n8n 1.106.3 \u2192 1.107.3 with data preservation",
+        "impact": "high",
+        "replication": "Clean container state, preserve volumes, use direct docker commands",
+        "learned_on": "2025-08-20T06:52:02.681521"
+      }
+    ],
+    "multimodal_workflow_deployment": [
+      {
+        "pattern": "Successfully deployed AI agent with multimodal Telegram input",
+        "impact": "high",
+        "replication": "Use validated nodes: telegramTrigger \u2192 code \u2192 langchain.agent \u2192 telegram",
+        "learned_on": "2025-08-20T06:52:02.681523"
+      }
+    ]
+  },
+  "user_feedback_patterns": [
+    {
+      "type": "validation_reminder",
+      "content": "Pull node types everytime you are generating a new workflow. Validate each node every time!",
+      "importance": "critical",
+      "implementation": "Added template_validator.py with mandatory pre-deployment validation",
+      "learned_on": "2025-08-20T06:52:02.681525"
+    },
+    {
+      "type": "approach_correction",
+      "content": "Use community template approach instead of custom generators",
+      "importance": "high",
+      "implementation": "Researched n8n.io/workflows community templates",
+      "learned_on": "2025-08-20T06:52:02.681527"
+    },
+    {
+      "type": "preference_ollama",
+      "content": "Use ollama in local instance running, use that first, langchain comes when that cant be used",
+      "importance": "medium",
+      "implementation": "Prioritize local Ollama over external services",
+      "learned_on": "2025-08-20T06:52:02.681528"
+    },
+    {
+      "type": "thorough_validation",
+      "content": "Be thorough and get on with your next tasks after validation",
+      "importance": "high",
+      "implementation": "Added comprehensive pre-deployment node validation",
+      "learned_on": "2025-08-20T06:52:02.681530"
+    }
+  ],
+  "last_updated": "2025-08-20T06:52:02.681535"
+}

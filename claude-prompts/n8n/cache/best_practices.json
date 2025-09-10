@@ -1,0 +1,1 @@
+{"version": "1.106.3", "node_version": "22.17.0", "execution_mode": "regular", "timezone": "America/New_York", "recommended_practices": {"error_workflow_enabled": false, "save_execution_progress": false, "workflow_tags_enabled": true, "langchain_available": true, "community_nodes_enabled": true}}

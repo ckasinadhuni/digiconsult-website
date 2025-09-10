@@ -1,0 +1,385 @@
+{
+  "name": "Telegram AI Assistant - Voice/File/Image (FINAL)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger", 
+      "type": "@n8n/n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "credentials": {
+        "telegramApi": "REPLACE_WITH_ACTUAL_TELEGRAM_CREDENTIAL_ID"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "voice-condition",
+              "leftValue": "={{ $json.message.voice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "photo-condition", 
+              "leftValue": "={{ $json.message.photo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "document-condition",
+              "leftValue": "={{ $json.message.document }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "text-condition",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "message-router",
+      "name": "Message Type Router",
+      "type": "@n8n/n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "id": "get-voice-file",
+      "name": "Get Voice File",
+      "type": "@n8n/n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [680, 180],
+      "credentials": {
+        "telegramApi": "REPLACE_WITH_ACTUAL_TELEGRAM_CREDENTIAL_ID"
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/transcribe",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{ $binary.data }}"
+            },
+            {
+              "name": "task", 
+              "value": "transcribe"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "enabled": true,
+            "maxAttempts": 2
+          }
+        }
+      },
+      "id": "transcribe-voice",
+      "name": "Transcribe Voice (faster-whisper)",
+      "type": "@n8n/n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 180]
+    },
+    {
+      "parameters": {
+        "resource": "file", 
+        "operation": "get",
+        "fileId": "={{ $json.message.photo ? $json.message.photo[0].file_id : $json.message.document.file_id }}"
+      },
+      "id": "get-image-file",
+      "name": "Get Image/File",
+      "type": "@n8n/n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [680, 320],
+      "credentials": {
+        "telegramApi": "REPLACE_WITH_ACTUAL_TELEGRAM_CREDENTIAL_ID"
+      }
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define", 
+        "text": "={{ $json.processed_text || $json.message?.text || 'Analyze this content and provide recommendations.' }}",
+        "hasOutputParser": false,
+        "options": {
+          "systemMessage": "You are a helpful AI assistant integrated with Telegram. Analyze user inputs (text, transcribed voice, or uploaded files) and provide:\n\n1. A clear, helpful response\n2. 2-3 specific action recommendations\n3. Keep responses concise but informative\n\nFor voice messages: The transcribed text will be provided.\nFor images/files: Describe what you can infer and suggest relevant actions.\n\nAlways end with actionable suggestions the user can take. Format recommendations clearly with numbers (1. 2. 3.) so they can be parsed for action buttons."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent with Ollama",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "model": "mistral:7b",
+        "options": {
+          "baseURL": "http://localhost:11434",
+          "temperature": 0.7,
+          "maxTokens": 500
+        }
+      },
+      "id": "ollama-model",
+      "name": "Ollama mistral:7b",
+      "type": "@n8n/n8n-nodes-langchain.chatOllama", 
+      "typeVersion": 1.2,
+      "position": [1120, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced response formatting with action recommendations\nconst input = $input.first().json;\nconst aiResponse = input.output || input.response || input.text || 'No response available';\nconst originalMessage = input.message || {};\n\n// Parse AI response for recommendations\nconst lines = aiResponse.split('\\n').filter(line => line.trim());\nlet mainResponse = '';\nconst actions = [];\n\n// Extract main response and recommendations\nlines.forEach((line, index) => {\n  const cleanLine = line.trim();\n  \n  // Look for numbered recommendations\n  if (cleanLine.match(/^\\d+\\./)) {\n    const action = cleanLine.replace(/^\\d+\\.\\s*/, '').trim();\n    if (action && actions.length < 3) {\n      actions.push({\n        text: action.length > 28 ? action.substring(0, 25) + '...' : action,\n        callback_data: `rec_${actions.length + 1}_${Date.now().toString().slice(-6)}`\n      });\n    }\n  }\n  // Look for bullet points or other recommendation formats\n  else if ((cleanLine.toLowerCase().includes('recommend') || \n            cleanLine.toLowerCase().includes('suggest') ||\n            cleanLine.startsWith('•') || cleanLine.startsWith('-')) &&\n           actions.length < 3) {\n    const action = cleanLine.replace(/^[•-]\\s*/, '')\n                           .replace(/.*(?:recommend|suggest)\\s*/i, '')\n                           .trim();\n    if (action.length > 5 && action.length < 100) {\n      actions.push({\n        text: action.length > 28 ? action.substring(0, 25) + '...' : action,\n        callback_data: `sug_${actions.length + 1}_${Date.now().toString().slice(-6)}`\n      });\n    }\n  }\n  // Collect main response content\n  else if (cleanLine && !cleanLine.toLowerCase().includes('recommendation') && \n           !cleanLine.match(/^\\d+\\./)) {\n    mainResponse += cleanLine + '\\n';\n  }\n});\n\n// If no specific recommendations found, create contextual ones\nif (actions.length === 0) {\n  const messageType = input.type || 'message';\n  switch(messageType) {\n    case 'voice':\n      actions.push({text: '🎤 Send another voice', callback_data: 'voice_more'});\n      actions.push({text: '📝 Get text version', callback_data: 'voice_text'});\n      break;\n    case 'image':\n    case 'photo':\n      actions.push({text: '🖼️ Upload another image', callback_data: 'img_more'});\n      actions.push({text: '🔍 Get more details', callback_data: 'img_detail'});\n      break;\n    case 'document':\n    case 'file':\n      actions.push({text: '📄 Upload another file', callback_data: 'file_more'});\n      actions.push({text: '📋 Get summary', callback_data: 'file_summary'});\n      break;\n    default:\n      actions.push({text: '💬 Continue chat', callback_data: 'chat_more'});\n      actions.push({text: '❓ Ask question', callback_data: 'ask_more'});\n  }\n}\n\n// Create inline keyboard with max 3 buttons\nconst keyboard = {\n  inline_keyboard: actions.length > 0 ? [\n    actions.slice(0, 3).map(action => ({\n      text: action.text,\n      callback_data: action.callback_data\n    }))\n  ] : []\n};\n\n// Clean up main response\nmainResponse = mainResponse.trim() || aiResponse;\nif (mainResponse.length > 1000) {\n  mainResponse = mainResponse.substring(0, 997) + '...';\n}\n\n// Get chat ID from message\nconst chatId = originalMessage.chat?.id || originalMessage.from?.id || input.chatId;\n\nif (!chatId) {\n  console.error('No chat ID found in message:', JSON.stringify(originalMessage, null, 2));\n}\n\nreturn {\n  json: {\n    chatId: chatId,\n    text: mainResponse + (actions.length > 0 ? '\\n\\n💡 Quick Actions:' : ''),\n    reply_markup: JSON.stringify(keyboard),\n    parse_mode: 'HTML'\n  }\n};"
+      },
+      "id": "format-response",
+      "name": "Format Response & Actions",
+      "type": "@n8n/n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage", 
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "reply_markup": "={{ $json.reply_markup }}",
+          "parse_mode": "={{ $json.parse_mode || 'HTML' }}"
+        }
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "@n8n/n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [1560, 300],
+      "credentials": {
+        "telegramApi": "REPLACE_WITH_ACTUAL_TELEGRAM_CREDENTIAL_ID"
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare text input for AI processing\nconst message = $input.first().json.message || $input.first().json;\nconst text = message.text || 'Empty message';\n\n// Add user context\nconst userInfo = message.from ? `${message.from.first_name || 'User'}` : 'User';\n\nreturn {\n  json: {\n    processed_text: `${userInfo} asked: \"${text}\"`,\n    message: message,\n    type: 'text',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "prepare-text-input",
+      "name": "Prepare Text Input", 
+      "type": "@n8n/n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 420]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare transcribed voice for AI processing\nconst transcriptionData = $input.first().json;\n\n// Get original message from the message router output\nconst routerOutput = $input.all().find(item => item.json.message);\nconst originalMessage = routerOutput?.json.message || {};\n\n// Extract transcription text\nlet transcribedText = '';\nif (transcriptionData.text) {\n  transcribedText = transcriptionData.text;\n} else if (transcriptionData.segments && transcriptionData.segments.length > 0) {\n  transcribedText = transcriptionData.segments.map(seg => seg.text).join(' ');\n} else {\n  transcribedText = 'Could not transcribe audio clearly';\n}\n\n// Add user context\nconst userInfo = originalMessage.from ? \n  `${originalMessage.from.first_name || 'User'}` : 'User';\n\nreturn {\n  json: {\n    processed_text: `${userInfo} sent a voice message: \"${transcribedText.trim()}\"`,\n    message: originalMessage,\n    type: 'voice',\n    transcription: transcribedText,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "prepare-voice-input",
+      "name": "Prepare Voice Input",
+      "type": "@n8n/n8n-nodes-base.code", 
+      "typeVersion": 2,
+      "position": [1120, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare image/file for AI processing\nconst fileData = $input.first().json;\n\n// Get original message from message router output\nconst routerOutput = $input.all().find(item => item.json.message);\nconst originalMessage = routerOutput?.json.message || {};\n\n// Determine file type and info\nlet fileType = 'file';\nlet fileName = 'unknown_file';\nlet fileSize = 0;\nlet mimeType = '';\n\nif (originalMessage.photo) {\n  fileType = 'image';\n  fileName = 'photo.jpg';\n  const largestPhoto = originalMessage.photo[originalMessage.photo.length - 1];\n  fileSize = largestPhoto.file_size || 0;\n} else if (originalMessage.document) {\n  const doc = originalMessage.document;\n  fileName = doc.file_name || 'document';\n  fileSize = doc.file_size || 0;\n  mimeType = doc.mime_type || '';\n  \n  if (mimeType.includes('image')) {\n    fileType = 'image';\n  } else if (mimeType.includes('audio')) {\n    fileType = 'audio';\n  } else if (mimeType.includes('video')) {\n    fileType = 'video';\n  } else {\n    fileType = 'document';\n  }\n}\n\n// Add user context\nconst userInfo = originalMessage.from ? \n  `${originalMessage.from.first_name || 'User'}` : 'User';\n\n// Create descriptive text for AI\nlet description = `${userInfo} uploaded a ${fileType}`;\nif (fileName !== 'unknown_file') {\n  description += ` named \"${fileName}\"`;\n}\nif (fileSize > 0) {\n  const sizeMB = (fileSize / 1024 / 1024).toFixed(2);\n  description += ` (${sizeMB}MB)`;\n}\ndescription += '. Please analyze this file and provide relevant suggestions or information.';\n\nreturn {\n  json: {\n    processed_text: description,\n    message: originalMessage,\n    type: fileType,\n    fileName: fileName,\n    fileSize: fileSize,\n    mimeType: mimeType,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "prepare-file-input",
+      "name": "Prepare File Input",
+      "type": "@n8n/n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 420]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Type Router": {
+      "main": [
+        [
+          {
+            "node": "Get Voice File",
+            "type": "main", 
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image/File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image/File", 
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Text Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Voice File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Voice (faster-whisper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Voice (faster-whisper)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Voice Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image/File": {
+      "main": [
+        [
+          {
+            "node": "Prepare File Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Text Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent with Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Voice Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent with Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare File Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent with Ollama", 
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent with Ollama": {
+      "main": [
+        [
+          {
+            "node": "Format Response & Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama mistral:7b": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent with Ollama",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response & Actions": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": {
+      "enabled": true
+    }
+  },
+  "staticData": {},
+  "tags": ["telegram", "ai", "voice", "image", "assistant", "ollama", "whisper"],
+  "triggerCount": 1,
+  "updatedAt": "2025-08-20T04:15:00.000Z",
+  "versionId": "4"
+}

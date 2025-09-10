@@ -1,0 +1,49 @@
+# System files
+.bash_history
+.bash_logout
+.bashrc
+.profile
+.viminfo
+.lesshst
+.sudo_as_admin_successful
+.ssh/
+.config/
+.ollama/
+.paddlex/
+.claude.json*
+.claude/
+test_audio.wav
+system_file_tree.txt
+.npm/
+.cache/
+
+# Backups and temporary files
+infra-backups/
+n8n-backup-*/
+*.sql.gz
+*.backup
+*.tmp
+*.log
+
+# Git configuration (local)
+.gitconfig
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables (if any added later)
+.env.local
+.env.production
+.env.development
+
+# Docker volumes data (if any local data)
+docker-data/
+volumes/
+
+# Temporary uploads
+uploads/
+temp/

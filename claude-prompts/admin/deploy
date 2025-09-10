@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Single Command Deployment for Telegram AI Assistant
+# Usage: ./deploy
+
+echo "🚀 Starting Telegram AI Assistant Deployment..."
+echo "================================================="
+
+cd /home/ubuntu/claude-prompts/admin
+
+# Run the fully automated Python deployment
+python3 fully-automated-deploy.py
+
+exit_code=$?
+
+if [ $exit_code -eq 0 ]; then
+    echo ""
+    echo "🎉 SUCCESS! Your Telegram AI Assistant is ready!"
+    echo "================================================="
+    echo "📱 Find your bot on Telegram and start chatting!"
+    echo "💬 Try sending:"
+    echo "   • Text messages"
+    echo "   • Voice messages" 
+    echo "   • Images or documents"
+    echo ""
+    echo "🔧 Powered by:"
+    echo "   • faster-whisper (voice transcription)"
+    echo "   • Ollama mistral:7b (AI responses)"
+    echo "   • n8n (workflow automation)"
+    echo "================================================="
+else
+    echo ""
+    echo "❌ Deployment failed. Check the logs above."
+    echo "💡 Common fixes:"
+    echo "   • Ensure n8n is running: http://localhost:5678"
+    echo "   • Verify faster-whisper: http://localhost:8000/health"
+    echo "   • Check Ollama: http://localhost:11434/api/tags"
+    exit 1
+fi

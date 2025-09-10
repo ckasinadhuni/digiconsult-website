@@ -1,0 +1,1164 @@
+#!/usr/bin/env python3
+
+"""
+Intelligent n8n Workflow Generator
+Dynamically creates any workflow with current best practices
+
+Usage:
+  ./generate telegram-ai-assistant
+  ./generate webhook-to-database --source="webhooks" --target="postgresql"
+  ./generate data-processor --input="csv" --ai="ollama"
+  ./generate scheduler --frequency="daily" --action="backup"
+"""
+
+import json
+import requests
+import time
+import sys
+import os
+from pathlib import Path
+from datetime import datetime, timedelta
+import argparse
+
+class IntelligentWorkflowGenerator:
+    def __init__(self):
+        self.config_path = Path(__file__).parent / "config.json"
+        self.cache_path = Path(__file__).parent / "cache"
+        self.cache_path.mkdir(exist_ok=True)
+        self.langchain_check_path = Path(__file__).parent / "langchain-requirements-check.md"
+        
+        # Load config
+        with open(self.config_path, 'r') as f:
+            self.config = json.load(f)
+        
+        self.headers = {
+            "X-N8N-API-KEY": self.config["api_key"],
+            "Content-Type": "application/json"
+        }
+        
+        self.base_url = self.config["base_url"]
+        
+        # CRITICAL: Always validate nodes using template validator first
+        self.validator = self.setup_node_validator()
+        if not self.validator:
+            raise Exception("❌ Node validator required - cannot generate without validation")
+        
+        # Check LangChain availability using proper endpoint
+        self.langchain_available = self.check_langchain_availability()
+        
+        # Load successful patterns for reference
+        self.load_successful_patterns()
+        
+    def log(self, message, level="INFO"):
+        """Simple logging"""
+        icons = {"INFO": "🔄", "SUCCESS": "✅", "ERROR": "❌", "WARNING": "⚠️"}
+        print(f"{icons.get(level, '•')} {message}")
+    
+    def check_langchain_availability(self):
+        """Check if LangChain nodes are available using correct endpoint"""
+        try:
+            response = requests.get(f"{self.base_url}/types/nodes.json", timeout=10)
+            if response.status_code == 200:
+                nodes_data = response.json()
+                langchain_nodes = [node for node in nodes_data if 'langchain' in node.get('name', '')]
+                langchain_count = len(langchain_nodes)
+                
+                if langchain_count > 0:
+                    self.log(f"✅ LangChain nodes available ({langchain_count} found)", "SUCCESS")
+                    return True
+                else:
+                    self.log("⚠️ LangChain nodes NOT available", "WARNING")
+                    return False
+            else:
+                self.log(f"❌ Node types endpoint failed: {response.status_code}", "ERROR")
+                return False
+        except Exception as e:
+            self.log(f"❌ LangChain check failed: {e}", "ERROR")
+            return False
+    
+    def setup_node_validator(self):
+        """Setup node validator for template validation - MANDATORY"""
+        try:
+            from template_validator import TemplateValidator
+            validator = TemplateValidator()
+            if not validator.fetch_available_nodes():
+                self.log("❌ Could not fetch available nodes", "ERROR")
+                return None
+            self.log("✅ Node validator ready with validated node types", "SUCCESS")
+            return validator
+        except Exception as e:
+            self.log(f"❌ Node validator setup failed: {e}", "ERROR")
+            return None
+    
+    def load_successful_patterns(self):
+        """Load successful workflow patterns to avoid previous issues"""
+        try:
+            with open(Path(__file__).parent / "learning_data.json", 'r') as f:
+                learning_data = json.load(f)
+                self.error_patterns = learning_data.get("error_patterns", {})
+                self.success_patterns = learning_data.get("success_patterns", {})
+                self.log("✅ Loaded learning patterns from previous sessions", "SUCCESS")
+        except Exception as e:
+            self.log(f"⚠️ Could not load learning patterns: {e}", "WARNING")
+            self.error_patterns = {}
+            self.success_patterns = {}
+    
+    def validate_node_before_use(self, node_type, type_version=None):
+        """Validate each node before adding to workflow - CRITICAL SUCCESS FACTOR"""
+        if not self.validator:
+            return False, "No validator available"
+        
+        is_valid, message = self.validator.validate_node(node_type, type_version)
+        
+        if not is_valid:
+            self.log(f"❌ Node validation failed: {node_type} v{type_version} - {message}", "ERROR")
+        else:
+            self.log(f"✅ Node validated: {node_type} v{type_version}", "SUCCESS")
+        
+        return is_valid, message
+    
+    def get_existing_credential_id(self, cred_type):
+        """Get existing credential ID instead of creating placeholders"""
+        credentials = self.discover_credentials()
+        creds_of_type = credentials.get(cred_type, [])
+        
+        if creds_of_type:
+            cred_id = creds_of_type[0]['id']
+            self.log(f"✅ Using existing {cred_type} credential: {cred_id}", "SUCCESS")
+            return cred_id
+        else:
+            self.log(f"❌ No {cred_type} credentials found", "ERROR")
+            return None
+    
+    def get_langchain_connection_type(self, node_type):
+        """Get correct LangChain connection type - learned from manual fixes"""
+        langchain_connections = {
+            "lmChatOllama": "ai_languageModel",
+            "chatOllama": "ai_languageModel", 
+            "lmOpenAi": "ai_languageModel",
+            "vectorStoreQdrant": "ai_vectorStore",
+            "memoryBufferWindow": "ai_memory",
+            "toolCalculator": "ai_tool",
+            "toolCode": "ai_tool"
+        }
+        
+        for pattern, connection_type in langchain_connections.items():
+            if pattern in node_type:
+                return connection_type
+        
+        return "main"  # fallback to regular connection
+    
+    def create_telegram_multimodal_router(self):
+        """Create proper multimodal router - CORRECT N8N FORMAT"""
+        
+        # MANDATORY: Review n8n Switch format before creating ANY router
+        self.mandatory_router_format_check()
+        
+        return {
+            "mode": "rules",
+            "rules": {
+                "values": [
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.text }}",
+                                    "rightValue": "/search",
+                                    "operator": {"type": "string", "operation": "startsWith"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "search_command"
+                    },
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.text }}",
+                                    "rightValue": "/files",
+                                    "operator": {"type": "string", "operation": "startsWith"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "files_command"
+                    },
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.voice }}",
+                                    "rightValue": "",
+                                    "operator": {"type": "object", "operation": "exists"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "voice_message"
+                    },
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.photo }}",
+                                    "rightValue": "",
+                                    "operator": {"type": "array", "operation": "notEmpty"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "photo_message"
+                    },
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.document }}",
+                                    "rightValue": "",
+                                    "operator": {"type": "object", "operation": "exists"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "document_message"
+                    }
+                ]
+            }
+        }
+    
+    def validate_router_completeness(self, router_node, expected_rules=5):
+        """MANDATORY: Validate router has complete rules and connections - CRITICAL FORMAT CHECK"""
+        
+        # Check for correct n8n Switch node format
+        params = router_node.get('parameters', {})
+        
+        if 'mode' not in params or params['mode'] != 'rules':
+            self.log("❌ CRITICAL: Router missing 'mode': 'rules'", "ERROR")
+            return False, "Router must have mode: rules"
+            
+        if 'rules' not in params or 'values' not in params['rules']:
+            self.log("❌ CRITICAL: Router missing 'rules.values' structure", "ERROR") 
+            return False, "Router must have rules.values array"
+            
+        rules = params['rules']['values']
+        
+        if len(rules) < expected_rules:
+            self.log(f"❌ Router incomplete: {len(rules)}/{expected_rules} rules", "ERROR")
+            return False, f"Missing {expected_rules - len(rules)} rules"
+            
+        # Validate each rule has proper structure
+        for i, rule in enumerate(rules):
+            if 'conditions' not in rule:
+                self.log(f"❌ Rule {i}: Missing conditions", "ERROR")
+                return False, f"Rule {i} missing conditions"
+                
+            if 'conditions' not in rule['conditions']:
+                self.log(f"❌ Rule {i}: Missing conditions.conditions array", "ERROR")
+                return False, f"Rule {i} missing conditions array"
+                
+            if not rule['conditions']['conditions']:
+                self.log(f"❌ Rule {i}: Empty conditions array", "ERROR")
+                return False, f"Rule {i} has empty conditions"
+        
+        self.log(f"✅ Router complete: {len(rules)} rules with proper n8n format", "SUCCESS")
+        return True, "Router validation passed"
+    
+    def mandatory_router_format_check(self):
+        """MANDATORY CHECK: Must review n8n Switch format before creating any router"""
+        
+        format_reminder = '''
+        🚨 CRITICAL: n8n Switch Node Format Requirements
+        
+        CORRECT FORMAT:
+        {
+            "mode": "rules",
+            "rules": {
+                "values": [
+                    {
+                        "conditions": {
+                            "options": {"caseSensitive": False},
+                            "conditions": [
+                                {
+                                    "leftValue": "={{ $json.message.text }}",
+                                    "rightValue": "/search", 
+                                    "operator": {"type": "string", "operation": "startsWith"}
+                                }
+                            ]
+                        },
+                        "renameOutput": True,
+                        "outputKey": "search_command"
+                    }
+                ]
+            }
+        }
+        
+        PYTHON BOOLEANS: Use True/False NOT true/false
+        CONNECTIONS: Must match rule count (5 rules = 5 outputs)
+        '''
+        
+        self.log(format_reminder, "WARNING")
+        return True
+    
+    def create_switch_node(self, node_id, name, rules_config, position):
+        """MANDATORY: Always use this method to create Switch nodes - includes format check"""
+        
+        # CRITICAL: Always check format before creating ANY Switch node
+        self.mandatory_router_format_check()
+        
+        return {
+            "parameters": rules_config,
+            "id": node_id,
+            "name": name,
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3,
+            "position": position
+        }
+    
+    def create_qdrant_vector_store(self, node_id, name, position, collection_name="digiconsult_master"):
+        """Create properly configured Qdrant vector store - no more NOT_SET values"""
+        return {
+            "parameters": {
+                "qdrantUrl": "http://localhost:6333",  # CRITICAL: Set actual URL
+                "collectionName": collection_name,      # CRITICAL: Set actual collection
+                "topK": 5,
+                "options": {}
+            },
+            "id": node_id,
+            "name": name,
+            "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+            "typeVersion": 1.3,
+            "position": position
+        }
+    
+    def create_vector_tool(self, node_id, name, position):
+        """Create properly configured vector search tool"""
+        return {
+            "parameters": {
+                "name": "vector_search",  # CRITICAL: Set tool name
+                "description": "Search the knowledge base using semantic vector search for relevant information and documents"
+            },
+            "id": node_id,
+            "name": name,
+            "type": "@n8n/n8n-nodes-langchain.toolVectorStore", 
+            "typeVersion": 1.1,
+            "position": position
+        }
+    
+    def create_code_tool(self, node_id, name, position):
+        """Create properly configured code execution tool"""
+        return {
+            "parameters": {
+                "name": "code_executor",  # CRITICAL: Set tool name
+                "description": "Execute Python code for data analysis, calculations, and processing"
+            },
+            "id": node_id,
+            "name": name,
+            "type": "@n8n/n8n-nodes-langchain.toolCode",
+            "typeVersion": 1.3,
+            "position": position
+        }
+    
+    def create_ai_agent(self, node_id, name, position, system_message):
+        """Create properly configured AI agent"""
+        return {
+            "parameters": {
+                "agent": "conversationalAgent",  # CRITICAL: Set agent type
+                "promptType": "define",
+                "text": "={{ $json.user_message }}",
+                "options": {
+                    "systemMessage": system_message,
+                    "maxTokens": 1000,
+                    "temperature": 0.7
+                }
+            },
+            "id": node_id,
+            "name": name,
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 1,
+            "position": position
+        }
+    
+    def get_cached_or_fetch(self, cache_key, fetch_func, max_age=300):
+        """Intelligent caching system"""
+        cache_file = self.cache_path / f"{cache_key}.json"
+        
+        # Check cache validity
+        if cache_file.exists():
+            cache_age = time.time() - cache_file.stat().st_mtime
+            if cache_age < max_age:
+                with open(cache_file, 'r') as f:
+                    return json.load(f)
+        
+        # Fetch fresh data
+        try:
+            data = fetch_func()
+            if data:
+                with open(cache_file, 'w') as f:
+                    json.dump(data, f)
+                return data
+        except Exception as e:
+            self.log(f"Fetch failed for {cache_key}: {e}", "WARNING")
+            # Return stale cache if available
+            if cache_file.exists():
+                with open(cache_file, 'r') as f:
+                    return json.load(f)
+        
+        return None
+    
+    def discover_credentials(self):
+        """Dynamically discover available credentials"""
+        def fetch_credentials():
+            try:
+                response = requests.get(f"{self.base_url}/api/credentials", headers=self.headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    # Handle both direct array and data wrapper
+                    return data.get('data', data) if isinstance(data, dict) else data
+                else:
+                    self.log(f"Failed to fetch credentials: {response.status_code}", "WARNING")
+                    return []
+            except Exception as e:
+                self.log(f"Error fetching credentials: {e}", "WARNING")
+                return []
+        
+        credentials = self.get_cached_or_fetch("credentials", fetch_credentials)
+        
+        # Organize by type for easy access
+        cred_map = {}
+        for cred in credentials or []:
+            cred_type = cred.get('type', 'unknown')
+            if cred_type not in cred_map:
+                cred_map[cred_type] = []
+            cred_map[cred_type].append({
+                'id': cred['id'],
+                'name': cred['name']
+            })
+        
+        return cred_map
+    
+    def get_best_practices(self):
+        """Fetch current n8n best practices"""
+        def fetch_best_practices():
+            try:
+                # Get n8n version and settings
+                response = requests.get(f"{self.base_url}/rest/settings")
+                if response.status_code == 200:
+                    settings = response.json().get('data', {})
+                    return {
+                        'version': settings.get('versionCli', 'unknown'),
+                        'node_version': settings.get('nodeJsVersion', 'unknown'),
+                        'execution_mode': settings.get('executionMode', 'regular'),
+                        'timezone': settings.get('timezone', 'UTC'),
+                        'recommended_practices': {
+                            'error_workflow_enabled': settings.get('enterprise', {}).get('errorWorkflow', False),
+                            'save_execution_progress': settings.get('saveExecutionProgress', False),
+                            'workflow_tags_enabled': not settings.get('workflowTagsDisabled', True),
+                            'langchain_available': True,  # Based on our earlier analysis
+                            'community_nodes_enabled': settings.get('communityNodesEnabled', False)
+                        }
+                    }
+            except:
+                pass
+            return None
+        
+        return self.get_cached_or_fetch("best_practices", fetch_best_practices)
+    
+    def discover_available_nodes(self):
+        """Discover available node types including community nodes"""
+        def fetch_node_types():
+            try:
+                # Get a sample workflow to analyze available node types
+                response = requests.get(f"{self.base_url}/api/v1/workflows", headers=self.headers)
+                if response.status_code == 200:
+                    workflows = response.json().get('data', [])
+                    node_types = set()
+                    
+                    for workflow in workflows[:5]:  # Sample first 5 workflows
+                        for node in workflow.get('nodes', []):
+                            node_types.add(node.get('type', ''))
+                    
+                    # Categorize known node types
+                    categories = {
+                        'triggers': [],
+                        'actions': [],
+                        'ai_langchain': [],
+                        'data_processing': [],
+                        'integrations': [],
+                        'community': []
+                    }
+                    
+                    for node_type in node_types:
+                        if 'trigger' in node_type.lower():
+                            categories['triggers'].append(node_type)
+                        elif 'langchain' in node_type.lower():
+                            categories['ai_langchain'].append(node_type)
+                        elif any(word in node_type.lower() for word in ['code', 'function', 'set', 'merge']):
+                            categories['data_processing'].append(node_type)
+                        elif not node_type.startswith('@n8n/n8n-nodes-base'):
+                            categories['community'].append(node_type)
+                        else:
+                            categories['integrations'].append(node_type)
+                    
+                    return categories
+            except:
+                pass
+            return None
+        
+        return self.get_cached_or_fetch("node_types", fetch_node_types, max_age=3600)  # Cache longer
+    
+    def generate_workflow_structure(self, workflow_type, **kwargs):
+        """Generate workflow based on type and current best practices"""
+        best_practices = self.get_best_practices()
+        credentials = self.discover_credentials()
+        available_nodes = self.discover_available_nodes()
+        
+        self.log(f"Generating {workflow_type} workflow with latest best practices")
+        
+        # Import AI agent patterns
+        import sys
+        sys.path.append(str(Path(__file__).parent / "templates"))
+        
+        try:
+            from ai_agent_patterns import AIAgentPatterns
+            from context_engineering import ContextEngineeringPatterns
+            
+            # Determine if this should use an AI agent pattern
+            ai_patterns = ["single-agent", "multi-agent-gatekeeper", "multi-agent-teams", "chained-requests"]
+            if any(pattern in workflow_type for pattern in ai_patterns):
+                return self._generate_ai_agent_workflow(workflow_type, credentials, available_nodes, **kwargs)
+        except ImportError:
+            self.log("AI agent patterns not available, using standard generation", "WARNING")
+        
+        # Base workflow structure with current best practices
+        workflow = {
+            "name": f"Generated {workflow_type.replace('-', ' ').title()} - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            "nodes": [],
+            "connections": {},
+            "pinData": {},
+            "settings": {},
+            "staticData": {},
+            "tags": [workflow_type, "context-engineered", "generated"],
+            "triggerCount": 0,
+        }
+        
+        # Add error workflow if available
+        if best_practices and best_practices.get('recommended_practices', {}).get('error_workflow_enabled'):
+            workflow["settings"]["errorWorkflow"] = {"enabled": True}
+        
+        # Generate workflow based on type
+        if workflow_type == "telegram-ai-assistant":
+            return self._generate_telegram_ai_workflow(workflow, credentials, available_nodes, **kwargs)
+        elif workflow_type == "webhook-to-database":
+            return self._generate_webhook_database_workflow(workflow, credentials, available_nodes, **kwargs)
+        elif workflow_type == "data-processor":
+            return self._generate_data_processor_workflow(workflow, credentials, available_nodes, **kwargs)
+        elif workflow_type == "scheduler":
+            return self._generate_scheduler_workflow(workflow, credentials, available_nodes, **kwargs)
+        else:
+            return self._generate_custom_workflow(workflow, workflow_type, credentials, available_nodes, **kwargs)
+    
+    def _generate_ai_agent_workflow(self, workflow_type, credentials, available_nodes, **kwargs):
+        """Generate AI agent workflow using n8n 2025 patterns with context engineering"""
+        from ai_agent_patterns import AIAgentPatterns
+        from context_engineering import ContextEngineeringPatterns
+        
+        # Determine pattern based on workflow type
+        if "single-agent" in workflow_type:
+            pattern = AIAgentPatterns.single_agent_pattern(credentials, self.config["local_services"], **kwargs)
+        elif "multi-agent-gatekeeper" in workflow_type:
+            pattern = AIAgentPatterns.multi_agent_gatekeeper_pattern(credentials, self.config["local_services"], **kwargs)
+        elif "multi-agent-teams" in workflow_type:
+            pattern = AIAgentPatterns.multi_agent_teams_pattern(credentials, self.config["local_services"], **kwargs)
+        elif "chained-requests" in workflow_type:
+            pattern = AIAgentPatterns.chained_requests_pattern(credentials, self.config["local_services"], **kwargs)
+        else:
+            # Default to single agent for unknown patterns
+            pattern = AIAgentPatterns.single_agent_pattern(credentials, self.config["local_services"], **kwargs)
+        
+        self.log(f"Using {pattern['pattern_name']} pattern (complexity: {pattern['complexity']})")
+        
+        # Apply context engineering optimizations
+        context_strategy = pattern.get('context_strategy', {})
+        self.log(f"Context optimization: {context_strategy.get('memory_strategy', 'default')} memory, {context_strategy.get('context_window_size', 4000)} token window")
+        
+        # Generate full workflow from pattern
+        workflow = {
+            "name": f"AI Agent: {pattern['pattern_name']} - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            "nodes": [],
+            "connections": {},
+            "pinData": {},
+            "settings": {},
+            "staticData": {},
+            "tags": ["ai-agent", pattern["pattern_name"].lower().replace(" ", "-"), "context-engineered", "generated"],
+            "triggerCount": 1 if pattern["flow"] != "networked" else 0,
+        }
+        
+        # Convert pattern nodes to actual n8n nodes with positions
+        position_x, position_y = 240, 300
+        node_id_map = {}
+        
+        for i, node_info in enumerate(pattern["nodes"]):
+            if isinstance(node_info, dict) and "node" in node_info:
+                node_id = f"node-{i}"
+                node_id_map[node_info["purpose"]] = node_id
+                
+                # Create basic node structure
+                node = {
+                    "id": node_id,
+                    "name": node_info["purpose"].replace("_", " ").title(),
+                    "type": node_info["node"],
+                    "typeVersion": 1.4 if "langchain" in node_info["node"] else 1.1,
+                    "position": [position_x, position_y],
+                    "parameters": {}
+                }
+                
+                # Add context-engineered parameters based on node type
+                if "langchain.agent" in node_info["node"]:
+                    # Use context-engineered prompts
+                    prompt_templates = pattern.get('prompt_templates', {})
+                    system_prompt = prompt_templates.get('system_prompt', f"You are a {node_info['purpose'].replace('_', ' ')} assistant.")
+                    
+                    node["parameters"] = {
+                        "agent": node_info.get("agent_type", "conversationalAgent"),
+                        "promptType": "define",
+                        "text": prompt_templates.get('user_prompt_template', "{{ $json.input || $json.message?.text || $json.query }}"),
+                        "options": {
+                            "systemMessage": system_prompt,
+                            "maxTokens": context_strategy.get('context_window_size', 4000),
+                            "temperature": 0.7,
+                                        }
+                    }
+                elif "langchain.chatOllama" in node_info["node"]:
+                    node["parameters"] = {
+                        "model": "mistral:7b",
+                        "options": {
+                            "baseURL": self.config["local_services"]["ollama"],
+                            "temperature": 0.7,
+                            "maxTokens": 500
+                        }
+                    }
+                elif "telegramTrigger" in node_info["node"]:
+                    telegram_cred = credentials.get('telegramApi', [{}])[0].get('id', 'MISSING_CREDS')
+                    node["parameters"] = {"updates": ["message"]}
+                    node["credentials"] = {"telegramApi": telegram_cred}
+                elif "webhook" in node_info["node"]:
+                    node["parameters"] = {"httpMethod": "POST", "path": "/webhook"}
+                elif "switch" in node_info["node"]:
+                    node["parameters"] = {
+                        "conditions": {
+                            "options": {"caseSensitive": True, "leftValue": "", "typeValidation": "strict"},
+                            "conditions": [{"leftValue": "={{ $json.type }}", "operator": {"type": "string", "operation": "exists"}}],
+                            "combinator": "or"
+                        }
+                    }
+                
+                workflow["nodes"].append(node)
+                position_x += 220
+                if i % 3 == 0 and i > 0:  # New row every 3 nodes
+                    position_x = 240
+                    position_y += 200
+            
+            elif isinstance(node_info, dict) and "nodes" in node_info:
+                # Handle node groups (like specialist_agents)
+                for j, sub_node in enumerate(node_info["nodes"]):
+                    sub_node_id = f"node-{i}-{j}"
+                    node_id_map[f"{node_info.get('type', 'group')}-{j}"] = sub_node_id
+                    
+                    node = {
+                        "id": sub_node_id,
+                        "name": sub_node["purpose"].replace("_", " ").title(),
+                        "type": sub_node["node"],
+                        "typeVersion": 1.4 if "langchain" in sub_node["node"] else 1.1,
+                        "position": [position_x, position_y],
+                        "parameters": {}
+                    }
+                    
+                    # Add parameters for sub-nodes
+                    if "langchain.agent" in sub_node["node"]:
+                        node["parameters"] = {
+                            "agent": sub_node.get("agent_type", "conversationalAgent"),
+                            "promptType": "define",
+                            "text": f"You are a {sub_node.get('specialization', sub_node['purpose'])} specialist.",
+                            "options": {"systemMessage": f"Specialize in {sub_node.get('specialization', 'general tasks')}."}
+                        }
+                    
+                    workflow["nodes"].append(node)
+                    position_x += 220
+                    if (i + j) % 3 == 0 and (i + j) > 0:
+                        position_x = 240
+                        position_y += 200
+        
+        # Create basic connections based on pattern flow
+        if pattern["flow"] == "linear_chain":
+            # Connect nodes in sequence
+            for i in range(len(workflow["nodes"]) - 1):
+                current_node = workflow["nodes"][i]["name"]
+                next_node = workflow["nodes"][i + 1]["name"]
+                workflow["connections"][current_node] = {
+                    "main": [[{"node": next_node, "type": "main", "index": 0}]]
+                }
+        elif pattern["flow"] == "hub_and_spoke":
+            # Create proper LangChain agent connections instead of invalid hub-and-spoke
+            agent_nodes = [n for n in workflow["nodes"] if "langchain.agent" in n["type"]]
+            tool_nodes = [n for n in workflow["nodes"] if "langchain.tool" in n["type"]]
+            memory_nodes = [n for n in workflow["nodes"] if "memory" in n["type"].lower()]
+            trigger_nodes = [n for n in workflow["nodes"] if "trigger" in n["type"].lower()]
+            
+            # Connect trigger to main agent only
+            if trigger_nodes and agent_nodes:
+                main_agent = agent_nodes[0]["name"]
+                workflow["connections"][trigger_nodes[0]["name"]] = {
+                    "main": [[{"node": main_agent, "type": "main", "index": 0}]]
+                }
+            
+            # LangChain agents automatically discover tools in the workflow
+            # No explicit tool connections needed - n8n handles this automatically
+        
+        return workflow
+    
+    def _generate_telegram_ai_workflow(self, workflow, credentials, nodes, **kwargs):
+        """Generate context-engineered Telegram AI Assistant workflow"""
+        from context_engineering import ContextEngineeringPatterns
+        
+        # Use validated credential lookup from learnings
+        telegram_cred_id = self.get_existing_credential_id('telegramApi')
+        
+        if not telegram_cred_id:
+            self.log("No Telegram API credentials found in n8n.", "ERROR")
+            if 'telegram_bot_token' in self.config:
+                self.log(f"Found local Telegram bot token: {self.config['telegram_bot_token'][:20]}...", "INFO")
+                self.log("Please create a Telegram credential in n8n UI with this token:", "INFO")
+                self.log(f"1. Go to {self.base_url}/credentials", "INFO")
+                self.log("2. Click 'Add Credential'", "INFO")
+                self.log("3. Select 'Telegram' as the credential type", "INFO")
+                self.log(f"4. Enter the bot token: {self.config['telegram_bot_token']}", "INFO")
+                self.log("5. Save and rerun this command", "INFO")
+            else:
+                self.log("No Telegram bot token found. Please:", "INFO")
+                self.log("1. Create a Telegram bot via @BotFather", "INFO")
+                self.log("2. Add the bot token to your n8n credentials", "INFO")
+            return None
+        
+        # Apply context engineering for Telegram AI workflows
+        context_config = ContextEngineeringPatterns.get_workflow_context_optimization("single_agent")
+        prompt_templates = ContextEngineeringPatterns.generate_context_optimized_prompt(
+            "Telegram AI Assistant",
+            "Provide helpful responses to Telegram messages using voice, image, and text processing"
+        )
+        
+        self.log(f"Telegram AI with context engineering: {context_config['memory_strategy']} memory, {context_config['context_window_size']} tokens")
+        
+        # Modern LangChain-based structure
+        workflow["nodes"] = [
+            {
+                "parameters": {"updates": ["message"]},
+                "id": "telegram-trigger",
+                "name": "Telegram Trigger",
+                "type": "n8n-nodes-base.telegramTrigger",  # EXACT format from validation
+                "typeVersion": 1.2,  # EXACT version from successful deployment
+                "position": [240, 300],
+                "credentials": {"telegramApi": telegram_cred_id}
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "options": {"caseSensitive": True, "leftValue": "", "typeValidation": "strict"},
+                        "conditions": [
+                            {
+                                "leftValue": "={{ $json.message.voice }}",
+                                "operator": {"type": "object", "operation": "exists"}
+                            },
+                            {
+                                "leftValue": "={{ $json.message.photo }}",
+                                "operator": {"type": "object", "operation": "exists"}
+                            },
+                            {
+                                "leftValue": "={{ $json.message.text }}",
+                                "operator": {"type": "string", "operation": "exists"}
+                            }
+                        ],
+                        "combinator": "or"
+                    }
+                },
+                "id": "message-router",
+                "name": "Message Router",
+                "type": "n8n-nodes-base.switch",  # EXACT format from validation
+                "typeVersion": 3,
+                "position": [460, 300]
+            },
+            {
+                "parameters": {
+                    "promptType": "define",
+                    "text": prompt_templates['user_prompt_template'],
+                    "options": {
+                        "systemMessage": prompt_templates['system_prompt'],
+                        "maxTokens": context_config['context_window_size'],
+                        "temperature": 0.7,
+                                }
+                },
+                "id": "ai-agent",
+                "name": "Context-Aware AI Agent",
+                "type": "@n8n/n8n-nodes-langchain.agent",  # EXACT format from validation
+                "typeVersion": 1,  # EXACT version from successful deployment
+                "position": [680, 300]
+            },
+            {
+                "parameters": {
+                    "model": "mistral:7b",
+                    "options": {
+                        "baseURL": self.config["local_services"]["ollama"],
+                        "temperature": 0.7,
+                        "maxTokens": context_config['context_window_size'] // 2,
+                        "contextLength": context_config['context_window_size']
+                    }
+                },
+                "id": "ollama-model",
+                "name": "Context-Optimized Ollama",
+                "type": "@n8n/n8n-nodes-langchain.lmChatOllama",  # EXACT format from validation
+                "typeVersion": 1,  # EXACT version from successful deployment
+                "position": [680, 420]
+            },
+            {
+                "parameters": ContextEngineeringPatterns.get_context_optimized_memory("persistent_session")["parameters"],
+                "id": "context-memory",
+                "name": "Context Memory",
+                "type": ContextEngineeringPatterns.get_context_optimized_memory("persistent_session")["node"],
+                "typeVersion": 1.2,
+                "position": [680, 540]
+            },
+            {
+                "parameters": {
+                    "resource": "message",
+                    "operation": "sendMessage",
+                    "chatId": "={{ $json.message.chat.id }}",
+                    "text": "={{ $json.output }}"
+                },
+                "id": "send-response",
+                "name": "Send Response",
+                "type": "n8n-nodes-base.telegram",  # EXACT format from validation
+                "typeVersion": 1.2,  # EXACT version from successful deployment
+                "position": [900, 300],
+                "credentials": {"telegramApi": telegram_cred_id}
+            }
+        ]
+        
+        # Context-engineered connections
+        workflow["connections"] = {
+            "Telegram Trigger": {
+                "main": [[{"node": "Message Router", "type": "main", "index": 0}]]
+            },
+            "Message Router": {
+                "main": [[{"node": "Context-Aware AI Agent", "type": "main", "index": 0}]]
+            },
+            "Context-Aware AI Agent": {
+                "main": [[{"node": "Send Response", "type": "main", "index": 0}]]
+            },
+            "Context-Optimized Ollama": {
+                "ai_languageModel": [[{"node": "Context-Aware AI Agent", "type": "ai_languageModel", "index": 0}]]
+            },
+            "Context Memory": {
+                "ai_memory": [[{"node": "Context-Aware AI Agent", "type": "ai_memory", "index": 0}]]
+            }
+        }
+        
+        workflow["triggerCount"] = 1
+        
+        # Store context engineering info in workflow name for reference
+        workflow["name"] = f"Telegram AI (Context: {context_config['memory_strategy']}, {context_config['context_window_size']}T) - {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        
+        return workflow
+    
+    def _generate_webhook_database_workflow(self, workflow, credentials, nodes, **kwargs):
+        """Generate webhook to database workflow"""
+        source = kwargs.get('source', 'webhook')
+        target = kwargs.get('target', 'database')
+        
+        workflow["nodes"] = [
+            {
+                "parameters": {"httpMethod": "POST", "path": f"/{source}"},
+                "id": "webhook-trigger",
+                "name": "Webhook Trigger",
+                "type": "@n8n/n8n-nodes-base.webhook",
+                "typeVersion": 1.1,
+                "position": [240, 300]
+            },
+            {
+                "parameters": {
+                    "jsCode": f"// Process {source} data\\nreturn $input.all().map(item => ({{\\n  json: {{\\n    ...item.json,\\n    processed_at: new Date().toISOString(),\\n    source: '{source}'\\n  }}\\n}}));"
+                },
+                "id": "data-processor",
+                "name": "Process Data",
+                "type": "@n8n/n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [460, 300]
+            }
+        ]
+        
+        # Add database node if credentials available
+        db_creds = credentials.get('postgres', []) or credentials.get('mysql', []) or []
+        if db_creds:
+            workflow["nodes"].append({
+                "parameters": {
+                    "operation": "insert",
+                    "table": f"{source}_data",
+                    "columns": "={{ Object.keys($json) }}"
+                },
+                "id": "database-insert",
+                "name": f"Insert to {target.title()}",
+                "type": "@n8n/n8n-nodes-base.postgres" if 'postgres' in credentials else "@n8n/n8n-nodes-base.mysql",
+                "typeVersion": 2,
+                "position": [680, 300],
+                "credentials": {"postgres" if 'postgres' in credentials else "mysql": db_creds[0]['id']}
+            })
+            
+            workflow["connections"] = {
+                "Webhook Trigger": {"main": [[{"node": "Process Data", "type": "main", "index": 0}]]},
+                "Process Data": {"main": [[{"node": f"Insert to {target.title()}", "type": "main", "index": 0}]]}
+            }
+        else:
+            self.log(f"No {target} credentials found. Adding HTTP Request node instead.", "WARNING")
+            workflow["nodes"].append({
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://httpbin.org/post",
+                    "sendBody": True,
+                    "bodyParameters": {"parameters": [{"name": "data", "value": "={{ JSON.stringify($json) }}"}]}
+                },
+                "id": "http-output",
+                "name": "HTTP Output",
+                "type": "@n8n/n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [680, 300]
+            })
+            
+            workflow["connections"] = {
+                "Webhook Trigger": {"main": [[{"node": "Process Data", "type": "main", "index": 0}]]},
+                "Process Data": {"main": [[{"node": "HTTP Output", "type": "main", "index": 0}]]}
+            }
+        
+        workflow["triggerCount"] = 1
+        return workflow
+    
+    def _generate_custom_workflow(self, workflow, workflow_type, credentials, nodes, **kwargs):
+        """Generate custom workflow based on type"""
+        self.log(f"Generating custom workflow: {workflow_type}")
+        
+        # Basic structure for any custom workflow
+        workflow["nodes"] = [
+            {
+                "parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 9 * * *"}]}},
+                "id": "schedule-trigger",
+                "name": "Schedule Trigger",
+                "type": "@n8n/n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.1,
+                "position": [240, 300]
+            },
+            {
+                "parameters": {
+                    "jsCode": f"// Custom {workflow_type} logic\\nconst workflowType = '{workflow_type}';\\nconst timestamp = new Date().toISOString();\\n\\nreturn [{{\\n  json: {{\\n    workflow_type: workflowType,\\n    executed_at: timestamp,\\n    parameters: {json.dumps(kwargs)},\\n    message: `Custom workflow ${workflow_type} executed successfully`\\n  }}\\n}}];"
+                },
+                "id": "custom-processor",
+                "name": f"Process {workflow_type.replace('-', ' ').title()}",
+                "type": "@n8n/n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [460, 300]
+            }
+        ]
+        
+        workflow["connections"] = {
+            "Schedule Trigger": {"main": [[{"node": f"Process {workflow_type.replace('-', ' ').title()}", "type": "main", "index": 0}]]}
+        }
+        
+        workflow["triggerCount"] = 1
+        return workflow
+    
+    def deploy_workflow(self, workflow_data):
+        """Deploy generated workflow with mandatory validation"""
+        self.log("Pre-deployment validation (MANDATORY)...")
+        
+        # CRITICAL: Validate ALL nodes before deployment
+        validation_errors = []
+        config_errors = []
+        
+        for node in workflow_data["nodes"]:
+            node_type = node.get("type")
+            type_version = node.get("typeVersion")
+            node_name = node.get("name", "Unknown")
+            params = node.get("parameters", {})
+            
+            # Node type validation
+            is_valid, message = self.validate_node_before_use(node_type, type_version)
+            if not is_valid:
+                validation_errors.append(f"{node_name}: {message}")
+            
+            # CRITICAL: Parameter validation based on learnings
+            if "vectorStoreQdrant" in node_type:
+                collection = params.get("collectionName")
+                url = params.get("qdrantUrl")
+                if not collection or collection == "knowledge_base":
+                    config_errors.append(f"{node_name}: Missing/wrong collection name (use digiconsult_master)")
+                if not url:
+                    config_errors.append(f"{node_name}: Missing qdrantUrl")
+            
+            elif "tool" in node_type.lower():
+                tool_name = params.get("name")
+                description = params.get("description")
+                if not tool_name:
+                    config_errors.append(f"{node_name}: Missing tool name parameter")
+                if not description:
+                    config_errors.append(f"{node_name}: Missing tool description")
+            
+            elif "langchain.agent" in node_type:
+                agent_type = params.get("agent")
+                if not agent_type:
+                    config_errors.append(f"{node_name}: Missing agent type (use conversationalAgent)")
+            
+            elif "switch" in node_type:
+                mode = params.get("mode")
+                if mode != "rules":
+                    config_errors.append(f"{node_name}: Switch must use mode: rules")
+                rules = params.get("rules", {}).get("values", [])
+                if len(rules) == 0:
+                    config_errors.append(f"{node_name}: Switch has no routing rules")
+        
+        if validation_errors:
+            self.log("❌ NODE VALIDATION FAILED:", "ERROR")
+            for error in validation_errors:
+                self.log(f"  - {error}", "ERROR")
+            return None
+        
+        if config_errors:
+            self.log("❌ CONFIGURATION VALIDATION FAILED:", "ERROR")
+            for error in config_errors:
+                self.log(f"  - {error}", "ERROR")
+            return None
+        
+        self.log("✅ All nodes and configurations validated - proceeding with deployment", "SUCCESS")
+        
+        # Clean workflow data - only include fields n8n accepts for deployment
+        clean_workflow = {
+            "name": workflow_data["name"],
+            "nodes": workflow_data["nodes"],
+            "connections": workflow_data["connections"],
+            "settings": workflow_data.get("settings", {})
+        }
+        
+        self.log(f"Deploying workflow with {len(clean_workflow['nodes'])} validated nodes")
+        
+        try:
+            response = requests.post(
+                f"{self.base_url}/api/v1/workflows",
+                headers=self.headers,
+                json=clean_workflow,
+                timeout=30
+            )
+            
+            if response.status_code in [200, 201]:
+                workflow_info = response.json()
+                workflow_id = workflow_info.get('id')
+                self.log(f"Workflow deployed! ID: {workflow_id}", "SUCCESS")
+                
+                # Auto-activate
+                activate_response = requests.patch(
+                    f"{self.base_url}/api/v1/workflows/{workflow_id}",
+                    headers=self.headers,
+                    json={"active": True}
+                )
+                
+                if activate_response.status_code == 200:
+                    self.log("Workflow activated!", "SUCCESS")
+                
+                return workflow_id
+            else:
+                self.log(f"Deployment failed: {response.status_code} - {response.text}", "ERROR")
+                return None
+        except Exception as e:
+            self.log(f"Deployment error: {e}", "ERROR")
+            return None
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Intelligent n8n Workflow Generator - 2025 Edition",
+        epilog="""
+Examples:
+  ./generate telegram-ai-assistant --deploy
+  ./generate single-agent --deploy
+  ./generate multi-agent-gatekeeper --deploy  
+  ./generate webhook-to-database --source=api --target=postgres
+  ./generate chained-requests --ai=ollama --deploy
+  
+AI Agent Patterns (n8n 2025 Best Practices):
+  single-agent              - One agent with multiple tools
+  multi-agent-gatekeeper    - Supervisor coordinating specialists  
+  multi-agent-teams         - Collaborative peer agents
+  chained-requests          - Sequential AI processing pipeline
+        """,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    parser.add_argument("workflow_type", help="Type of workflow to generate")
+    parser.add_argument("--source", help="Source for data workflows")
+    parser.add_argument("--target", help="Target for data workflows")
+    parser.add_argument("--input", help="Input type")
+    parser.add_argument("--ai", help="AI model to use")
+    parser.add_argument("--frequency", help="Frequency for scheduled workflows")
+    parser.add_argument("--action", help="Action to perform")
+    parser.add_argument("--deploy", action="store_true", help="Deploy workflow after generation")
+    parser.add_argument("--list-patterns", action="store_true", help="List available AI agent patterns")
+    
+    args = parser.parse_args()
+    
+    # Handle special commands
+    if args.list_patterns:
+        print("Available AI Agent Patterns:")
+        print("  single-agent           - Simple, one agent with tools")
+        print("  chained-requests       - Sequential processing pipeline") 
+        print("  multi-agent-gatekeeper - Supervisor with specialists")
+        print("  multi-agent-teams      - Collaborative agent network")
+        print("\nUse cases:")
+        print("  single-agent:          customer support, personal assistant")
+        print("  chained-requests:      content processing, data analysis")
+        print("  multi-agent-gatekeeper: business workflows, multi-domain")
+        print("  multi-agent-teams:     research, complex problem solving")
+        return 0
+    
+    generator = IntelligentWorkflowGenerator()
+    
+    # Generate workflow
+    workflow_data = generator.generate_workflow_structure(
+        args.workflow_type,
+        source=args.source,
+        target=args.target,
+        input=args.input,
+        ai=args.ai,
+        frequency=args.frequency,
+        action=args.action
+    )
+    
+    if not workflow_data:
+        generator.log("Workflow generation failed", "ERROR")
+        return 1
+    
+    # Save locally
+    output_file = Path(f"/home/ubuntu/claude-prompts/n8n/generated-{args.workflow_type}-{int(time.time())}.json")
+    with open(output_file, 'w') as f:
+        json.dump(workflow_data, f, indent=2)
+    
+    generator.log(f"Workflow saved: {output_file}", "SUCCESS")
+    
+    # Deploy if requested
+    if args.deploy:
+        workflow_id = generator.deploy_workflow(workflow_data)
+        if workflow_id:
+            generator.log(f"View workflow: {generator.base_url}/workflow/{workflow_id}", "SUCCESS")
+    
+    return 0
+
+if __name__ == "__main__":
+    exit(main())

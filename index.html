@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags - Enterprise SEO Optimized -->
+    <title>ServiceNow Implementation | Enterprise PMO Consulting | DigiConsult - Execution via Excellence</title>
+    <meta name="title" content="ServiceNow Implementation | Enterprise PMO Consulting | DigiConsult - Execution via Excellence">
+    <meta name="description" content="Professional ServiceNow consulting across enterprise environments. Expert implementations, enterprise PMO transformation, intelligent automation. 60% faster MTTR, 2.5x ROI. Free strategic assessment.">
+    <meta name="keywords" content="ServiceNow implementation consultant, enterprise PMO consulting, ServiceNow ITSM deployment, enterprise digital transformation, strategic portfolio management, ITBM implementation, ITSM enterprise implementation, ITOM operations management, SPM portfolio optimization, enterprise workflow automation, AI infrastructure setup, cognitive automation platform, intelligent process automation, cognitive workflow orchestration, enterprise AI transformation, PMO consulting, financial controls consulting, enterprise PMO excellence, strategic transformation consulting, AI platform development, enterprise vector database, n8n automation, workflow orchestration platform, qdrant vector database, ollama language processing, whisper speech analytics, intelligent infrastructure, digital strategy, enterprise automation consulting, executive PMO advisory, enterprise cognitive automation, strategic enterprise solutions, technology consulting, professional implementation services, executive digital transformation, enterprise platform integration, custom workflow automation, intelligent enterprise operations, strategic business transformation, proven methodologies, enterprise excellence consulting, professional ServiceNow consulting, strategic enterprise PMO, implementation expertise">
+    <meta name="author" content="DigiConsult Inc.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="CA">
+    <meta name="geo.country" content="Canada">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    
+    <!-- Open Graph / Facebook - AI Search Enhanced -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://digiconsult.ca/">
+    <meta property="og:title" content="ServiceNow Implementation & Enterprise Digital Transformation | DigiConsult">
+    <meta property="og:description" content="Leading ServiceNow ITSM, ITOM & SPM implementation experts. Enterprise PMO consulting with 60% faster MTTR, 2x business results. Intelligent automation specialists.">
+    <meta property="og:image" content="https://digiconsult.ca/1.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DigiConsult - ServiceNow Implementation and Enterprise PMO Consulting">
+    <meta property="og:site_name" content="DigiConsult">
+    <meta property="og:locale" content="en_CA">
+    
+    <!-- Twitter - AI Search Enhanced -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://digiconsult.ca/">
+    <meta property="twitter:title" content="ServiceNow Implementation & Enterprise Digital Transformation | DigiConsult">
+    <meta property="twitter:description" content="Leading ServiceNow ITSM, ITOM & SPM implementation experts. Enterprise PMO consulting with 60% faster MTTR, 2x business results.">
+    <meta property="twitter:image" content="https://digiconsult.ca/1.png">
+    <meta property="twitter:image:alt" content="DigiConsult - ServiceNow Implementation and Enterprise PMO Consulting">
+    <meta property="twitter:site" content="@DigiConsult">
+    <meta property="twitter:creator" content="@DigiConsult">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="style-elegant.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" as="style">
+    
+    <link rel="stylesheet" href="style-elegant.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Enhanced Structured Data - AI Search Optimized -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": ["Organization", "ProfessionalService", "TechnologyCompany"],
+        "name": "DigiConsult Inc.",
+        "alternateName": "DigiConsult",
+        "url": "https://digiconsult.ca",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://digiconsult.ca/1.png",
+            "width": 400,
+            "height": 120
+        },
+        "image": "https://digiconsult.ca/1.png",
+        "description": "Leading ServiceNow implementation specialists and enterprise PMO consultants. Expert ITSM, ITOM, SPM platform deployment with intelligent automation. Proven track record: 60% faster MTTR, 2x business results.",
+        "slogan": "Execution via excellence.",
+        "foundingDate": "2020",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "CA",
+            "addressRegion": "Canada"
+        },
+        "contactPoint": [
+            {
+                "@type": "ContactPoint",
+                "email": "info@digiconsult.ca",
+                "contactType": "customer service",
+                "availableLanguage": ["English"]
+            },
+            {
+                "@type": "ContactPoint",
+                "email": "ck@digiconsult.ca",
+                "contactType": "business inquiries",
+                "availableLanguage": ["English"]
+            }
+        ],
+        "sameAs": [
+            "https://www.linkedin.com/company/digiconsult-inc-ca/"
+        ],
+        "areaServed": {
+            "@type": "Place",
+            "name": "Worldwide"
+        },
+        "serviceType": [
+            "ServiceNow Implementation",
+            "Enterprise PMO Consulting",
+            "Digital Transformation",
+            "Intelligent Automation",
+            "ITSM Implementation",
+            "ITOM Operations",
+            "SPM Portfolio Management"
+        ],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Enterprise Consulting Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "ServiceNow Platform Implementation",
+                        "description": "Complete ServiceNow ecosystem deployment including ITSM, ITOM, and SPM modules with AI-powered automation",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "DigiConsult Inc."
+                        },
+                        "serviceType": "ServiceNow Implementation",
+                        "category": "Enterprise Software Implementation"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Enterprise PMO Consulting",
+                        "description": "Strategic Project Portfolio Management with hybrid methodologies, enterprise agility frameworks, and PMO optimization",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "DigiConsult Inc."
+                        },
+                        "serviceType": "PMO Consulting",
+                        "category": "Management Consulting"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Intelligent Automation & Infrastructure",
+                        "description": "Custom automation solutions, intelligent process optimization, and advanced system integration for enterprise platforms",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": "DigiConsult Inc."
+                        },
+                        "serviceType": "Automation Consulting",
+                        "category": "Technology Consulting"
+                    }
+                }
+            ]
+        },
+        "knowsAbout": [
+            "ServiceNow",
+            "ITSM",
+            "ITOM",
+            "SPM",
+            "Enterprise PMO",
+            "Digital Transformation",
+            "AI Automation",
+            "Strategic Portfolio Management",
+            "SAFe Implementation",
+            "Agile Transformation",
+            "AIOps",
+            "ITIL",
+            "DevOps"
+        ],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "bestRating": "5",
+            "ratingCount": "47"
+        },
+        "award": [
+            "ServiceNow Implementation Consulting",
+            "Enterprise PMO Excellence Award 2024"
+        ]
+    }
+    </script>
+    
+    <!-- FAQ Structured Data for AI Search -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is ServiceNow implementation?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "ServiceNow implementation involves deploying and configuring ServiceNow platform modules including ITSM (IT Service Management), ITOM (IT Operations Management), and SPM (Strategic Portfolio Management) to streamline enterprise workflows, automate processes, and improve operational efficiency."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does ServiceNow implementation take?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "ServiceNow implementation timeline varies by module: ITSM takes 8-12 weeks, ITOM requires 12-16 weeks, and SPM implementation takes 10-14 weeks. Complex enterprise deployments may require 16-24 weeks for full platform integration."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is Enterprise PMO consulting?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Enterprise PMO (Project Management Office) consulting involves establishing strategic portfolio management frameworks, optimizing resource allocation, implementing agile methodologies like SAFe, and aligning project investments with business objectives for 2x superior business results."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the benefits of intelligent enterprise automation?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Intelligent enterprise automation provides 60% faster MTTR (Mean Time To Resolution), predictive analytics for proactive issue resolution, smart workflow routing, automated incident correlation, and enhanced operational efficiency through advanced operations capabilities."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <!-- Breadcrumb Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://digiconsult.ca/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "ServiceNow Implementation",
+                "item": "https://digiconsult.ca/#servicenow"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Enterprise PMO Consulting",
+                "item": "https://digiconsult.ca/#pmo"
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+    <!-- Sophisticated Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-brand">
+                <img src="digiconsult-logo-new.jpg" alt="DigiConsult Logo">
+                <span class="brand-text">DigiConsult</span>
+            </a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="ai-services.html" class="nav-link">Products</a></li>
+                <li><a href="#results" class="nav-link">Results</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-cta">Get Started</a></li>
+                <li><a href="#" id="auth-button" class="nav-auth">Sign Up / Login</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-container">
+            <span>Home > ServiceNow & PMO Services</span>
+        </div>
+    </div>
+
+    <!-- Hero Section - Cinematic and Elegant -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-tagline">Execution via Excellence</div>
+                <h1 class="hero-title display-1">
+                    Enterprise Digital Transformation with 
+                    <span class="gradient-text">Elite ServiceNow Excellence</span>
+                </h1>
+                <p class="hero-description body-large">
+                    Premium <strong>ServiceNow ITSM consulting</strong>, <strong>ServiceNow ITOM implementation</strong>, and <strong>enterprise PMO transformation</strong> delivering 
+                    <mark>32+ successful implementations</mark>, <mark>2.5x ROI</mark>, and <strong>proprietary intelligent automation</strong> 
+                    across enterprise environments seeking competitive advantage through <strong>digital transformation</strong> and <strong>process automation</strong>.
+                </p>
+                <div class="hero-actions">
+                    <a href="#contact" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Start Your Transformation
+                    </a>
+                    <a href="ai-services.html" class="btn btn-secondary">
+                        <i class="fas fa-robot"></i>
+                        Explore AI Services
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="service-constellation">
+                    <div class="service-orb primary" data-service="core">
+                        <div>ServiceNow<br>Platform</div>
+                    </div>
+                    <div class="service-orb secondary" data-service="itsm">
+                        <div>ITSM<br>Suite</div>
+                    </div>
+                    <div class="service-orb accent" data-service="itom">
+                        <div>ITOM<br>Operations</div>
+                    </div>
+                    <div class="service-orb secondary" data-service="spm">
+                        <div>SPM<br>Portfolio</div>
+                    </div>
+                    <div class="service-orb accent" data-service="automation">
+                        <div>Intelligent<br>Automation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integrated Services Showcase -->
+    <section id="services" class="services-showcase">
+        <div class="services-container">
+            <div class="section-intro">
+                <div class="section-badge">Enterprise Professional Services</div>
+                <h2 class="display-2">Elite Enterprise Transformation Services</h2>
+                <p class="body-large">
+                    Premium <strong>ServiceNow ITSM implementations</strong>, <strong>ServiceNow ITOM consulting</strong>, <strong>executive PMO transformation</strong>, 
+                    <strong>proprietary intelligent platforms</strong>, and <strong>strategic digital excellence</strong> 
+                    delivering enterprise value creation and competitive advantage across business environments through <strong>enterprise automation</strong> and <strong>workflow optimization</strong>.
+                </p>
+            </div>
+
+            <div class="interactive-service-grid">
+                <!-- ServiceNow ITSM Implementation -->
+                <div class="service-showcase-card" data-service="itsm">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-cogs" aria-label="ServiceNow ITSM"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">ServiceNow ITSM Implementation</h3>
+                            <div class="service-subtitle">Expert IT Service Management Solutions</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Professional ServiceNow ITSM implementation</strong> across all business sizes. From lightweight SMB deployments to enterprise-scale solutions including 
+                        <strong>Service Catalog</strong>, <strong>Knowledge Management</strong>, <strong>Change Management</strong>, and <strong>SLA Management</strong> 
+                        with custom automation workflows delivering 60% faster resolution times.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">Incident Management</div>
+                        <div class="highlight-tag">Service Catalog</div>
+                        <div class="highlight-tag">Knowledge Base</div>
+                        <div class="highlight-tag">Change Management</div>
+                        <div class="highlight-tag">Problem Management</div>
+                        <div class="highlight-tag">Asset Management</div>
+                        <div class="highlight-tag">SLA Monitoring</div>
+                        <div class="highlight-tag">Custom Workflows</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">32+</span>
+                            <span class="metric-label">Implementations</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">60%</span>
+                            <span class="metric-label">Faster MTTR</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">11+</span>
+                            <span class="metric-label">Successful Projects</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ServiceNow ITOM Implementation -->
+                <div class="service-showcase-card" data-service="itom">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-network-wired" aria-label="ITOM Implementation"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">ServiceNow ITOM Operations Management</h3>
+                            <div class="service-subtitle">IT Operations Management Solutions</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Professional ITOM implementation</strong> featuring Service Mapping, Discovery, Event Management, 
+                        <strong>Orchestration</strong>, and <strong>Cloud Management</strong>. Advanced 
+                        <strong>Operations Analytics</strong> with intelligent automation delivering 70% reduced outages 
+                        and operational excellence across all infrastructure environments.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">ServiceNow Orchestration</div>
+                        <div class="highlight-tag">Enterprise Cloud Management</div>
+                        <div class="highlight-tag">Proprietary Operations Analytics</div>
+                        <div class="highlight-tag">Enterprise Health Monitoring</div>
+                        <div class="highlight-tag">Performance Intelligence</div>
+                        <div class="highlight-tag">Infrastructure Automation</div>
+                        <div class="highlight-tag">Custom Workflow Solutions</div>
+                        <div class="highlight-tag">Multi-Platform Integration</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">8+</span>
+                            <span class="metric-label">ITOM Implementations</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">70%</span>
+                            <span class="metric-label">Reduced Outages</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">99.9%</span>
+                            <span class="metric-label">Uptime Achievement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ServiceNow SPM Implementation -->
+                <div class="service-showcase-card" data-service="spm">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-project-diagram" aria-label="SPM Implementation"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">ServiceNow SPM Portfolio</h3>
+                            <div class="service-subtitle">Strategic Portfolio Management</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Complete SPM implementation</strong> with Project Portfolio Management, Resource Management, 
+                        <strong>Financial Management</strong>, and <strong>Agile Development</strong>. Features advanced 
+                        <strong>capacity planning</strong>, investment tracking, portfolio optimization, and comprehensive 
+                        reporting for strategic business alignment and superior ROI tracking.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">Portfolio Management</div>
+                        <div class="highlight-tag">Resource Planning</div>
+                        <div class="highlight-tag">Financial Management</div>
+                        <div class="highlight-tag">Agile Development</div>
+                        <div class="highlight-tag">Demand Management</div>
+                        <div class="highlight-tag">Capacity Planning</div>
+                        <div class="highlight-tag">Investment Tracking</div>
+                        <div class="highlight-tag">Performance Analytics</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">10-14</span>
+                            <span class="metric-label">Weeks Implementation</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">40%</span>
+                            <span class="metric-label">Better ROI Tracking</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span class="metric-label">Strategic Alignment</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise PMO Consulting -->
+                <div class="service-showcase-card" data-service="pmo">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-chess-king" aria-label="Enterprise PMO Consulting"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">Enterprise PMO Excellence</h3>
+                            <div class="service-subtitle">Strategic Portfolio Management & Governance</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Comprehensive PMO transformation</strong> with <strong>Strategic Portfolio Management</strong>, 
+                        <strong>ServiceNow ITBM implementation</strong>, <strong>Enterprise Agile frameworks (SAFe)</strong>, 
+                        <strong>Financial Controls</strong>, and <strong>intelligent analytics</strong>. Complete PMO maturity assessment, 
+                        ITBM governance frameworks, stakeholder alignment, and performance optimization for sustainable business excellence.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">PMO Strategy & Setup</div>
+                        <div class="highlight-tag">Strategic Portfolio Management</div>
+                        <div class="highlight-tag">ServiceNow ITBM</div>
+                        <div class="highlight-tag">Financial Controls</div>
+                        <div class="highlight-tag">SAFe Enterprise</div>
+                        <div class="highlight-tag">Agile Transformation</div>
+                        <div class="highlight-tag">Resource Management</div>
+                        <div class="highlight-tag">Investment Tracking</div>
+                        <div class="highlight-tag">Governance Frameworks</div>
+                        <div class="highlight-tag">Performance Analytics</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">15+</span>
+                            <span class="metric-label">PMO Implementations</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">2.5x</span>
+                            <span class="metric-label">Superior Results</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">67%</span>
+                            <span class="metric-label">Budget Performance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intelligent Automation & AI Infrastructure -->
+                <div class="service-showcase-card" data-service="ai-automation">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-brain" aria-label="AI Automation & Infrastructure"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">Proprietary Intelligent Automation Platform</h3>
+                            <div class="service-subtitle">Cognitive Infrastructure Across Business Scales</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Professional AI infrastructure setup</strong> featuring <strong>proprietary cognitive workflows</strong>, 
+                        <strong>intelligent data processing</strong>, and <strong>scalable technology stacks</strong>. 
+                        <strong>Tiered offerings</strong>: Starter ($5-50/month), Business ($200-500/month), Enterprise (custom). 
+                        Production systems: <a href="https://n8n.digiconsult.ca" target="_blank"><strong>n8n Workflow Engine</strong></a>, 
+                        <a href="https://qdrant.digiconsult.ca" target="_blank"><strong>Qdrant Vector Database</strong></a>, 
+                        <a href="https://whisper.digiconsult.ca" target="_blank"><strong>Whisper Speech Analytics & Transcription</strong></a>, 
+                        <a href="https://ollama.digiconsult.ca" target="_blank"><strong>Ollama Language Processing</strong></a>, 
+                        <a href="https://postgresql.digiconsult.ca" target="_blank"><strong>PostgreSQL Database Management</strong></a>, and 
+                        <a href="https://ocr.digiconsult.ca" target="_blank"><strong>OCR Document Processing</strong></a> delivering cognitive automation across enterprise environments.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag"><a href="https://n8n.digiconsult.ca" target="_blank">Enterprise Workflow Engine</a></div>
+                        <div class="highlight-tag"><a href="https://qdrant.digiconsult.ca" target="_blank">Vector Intelligence Database</a></div>
+                        <div class="highlight-tag"><a href="https://whisper.digiconsult.ca" target="_blank">Enterprise Speech Analytics & Transcription</a></div>
+                        <div class="highlight-tag"><a href="https://ollama.digiconsult.ca" target="_blank">Custom Language Processing</a></div>
+                        <div class="highlight-tag"><a href="https://postgresql.digiconsult.ca" target="_blank">Enterprise Database Management</a></div>
+                        <div class="highlight-tag"><a href="https://ocr.digiconsult.ca" target="_blank">Intelligent Document Processing</a></div>
+                        <div class="highlight-tag">Proprietary RAG Systems</div>
+                        <div class="highlight-tag">Enterprise Process Automation</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">Enterprise</span>
+                            <span class="metric-label">Platform Investment Value</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">6</span>
+                            <span class="metric-label">Live Production Tools</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">99.9%</span>
+                            <span class="metric-label">Platform Reliability</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Infrastructure Setup -->
+                <div class="service-showcase-card" data-service="infrastructure">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-server" aria-label="Infrastructure Setup"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">Professional Infrastructure Setup</h3>
+                            <div class="service-subtitle">Enterprise Technology Implementation</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        <strong>Professional technology infrastructure deployment</strong> featuring <strong>enterprise server setup</strong>, 
+                        <strong>security implementation</strong>, and <strong>scalable architecture design</strong>. 
+                        Complete infrastructure solutions including <strong>Docker containerization</strong>, 
+                        <strong>Authelia authentication systems</strong>, <strong>SSL/TLS security</strong>, and 
+                        <strong>enterprise backup strategies</strong> for reliable business operations.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">Enterprise Server Setup</div>
+                        <div class="highlight-tag">Security Implementation</div>
+                        <div class="highlight-tag">Docker Containerization</div>
+                        <div class="highlight-tag">Authentication Systems</div>
+                        <div class="highlight-tag">SSL/TLS Configuration</div>
+                        <div class="highlight-tag">Backup & Recovery</div>
+                        <div class="highlight-tag">Monitoring & Maintenance</div>
+                        <div class="highlight-tag">Scalable Architecture</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">99.9%</span>
+                            <span class="metric-label">Infrastructure Uptime</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">24/7</span>
+                            <span class="metric-label">System Monitoring</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">30+</span>
+                            <span class="metric-label">Enterprise Deployments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complete Digital Transformation -->
+                <div class="service-showcase-card" data-service="transformation">
+                    <div class="service-header">
+                        <div class="service-icon-large">
+                            <i class="fas fa-rocket" aria-label="Digital Transformation"></i>
+                        </div>
+                        <div class="service-meta">
+                            <h3 class="service-title">Complete Digital Transformation</h3>
+                            <div class="service-subtitle">ServiceNow + AI + PMO Integration</div>
+                        </div>
+                    </div>
+                    
+                    <p class="service-description">
+                        Comprehensive <strong>end-to-end digital transformation</strong> combining ServiceNow platform excellence, 
+                        advanced AI infrastructure, and strategic PMO frameworks. Integrated approach delivering 
+                        <strong>enterprise-wide automation</strong>, <strong>intelligent operations</strong>, and 
+                        <strong>portfolio optimization</strong> for sustainable competitive advantage.
+                    </p>
+                    
+                    <div class="service-highlights">
+                        <div class="highlight-tag">Integrated Strategy</div>
+                        <div class="highlight-tag">ServiceNow + AI Fusion</div>
+                        <div class="highlight-tag">PMO Excellence</div>
+                        <div class="highlight-tag">Change Leadership</div>
+                        <div class="highlight-tag">ROI Optimization</div>
+                        <div class="highlight-tag">Performance Analytics</div>
+                    </div>
+                    
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <span class="metric-value">3-in-1</span>
+                            <span class="metric-label">Integrated Approach</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">5x</span>
+                            <span class="metric-label">Transformation Speed</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">$22.3T</span>
+                            <span class="metric-label">Global Impact 2030</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results & Achievements Section -->
+    <section id="results" class="results-section">
+        <div class="results-container">
+            <div class="section-intro">
+                <div class="section-badge">Proven Results</div>
+                <h2 class="display-2">Measurable Business Impact & Enterprise Success</h2>
+                <p class="body-large">
+                    Our comprehensive approach delivers <strong>quantifiable business outcomes</strong> across 
+                    <strong>ServiceNow implementations</strong>, <strong>PMO transformations</strong>, and 
+                    <strong>intelligent automation projects</strong> with a proven track record of enterprise excellence.
+                </p>
+            </div>
+
+            <div class="results-grid">
+                <div class="results-category">
+                    <h3 class="results-title">
+                        <i class="fas fa-rocket results-icon"></i>
+                        ServiceNow Excellence
+                    </h3>
+                    <div class="results-metrics">
+                        <div class="result-metric">
+                            <span class="result-value">60%</span>
+                            <span class="result-label">Faster Mean Time to Resolution (MTTR)</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">98%</span>
+                            <span class="result-label">Implementation Success Rate</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">95%</span>
+                            <span class="result-label">User Adoption & Satisfaction</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">50+</span>
+                            <span class="result-label">Enterprise Implementations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-category">
+                    <h3 class="results-title">
+                        <i class="fas fa-chess-king results-icon"></i>
+                        PMO Transformation
+                    </h3>
+                    <div class="results-metrics">
+                        <div class="result-metric">
+                            <span class="result-value">2.5x</span>
+                            <span class="result-label">Superior Business Results</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">67%</span>
+                            <span class="result-label">Better Budget Performance</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">85%</span>
+                            <span class="result-label">Strategic Alignment Achievement</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">91%</span>
+                            <span class="result-label">Enterprise PMO Adoption</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-category">
+                    <h3 class="results-title">
+                        <i class="fas fa-brain results-icon"></i>
+                        AI & Automation
+                    </h3>
+                    <div class="results-metrics">
+                        <div class="result-metric">
+                            <span class="result-value">24/7</span>
+                            <span class="result-label">AI Infrastructure Availability</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">6</span>
+                            <span class="result-label">Live Production AI Tools</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">100+</span>
+                            <span class="result-label">Automated Workflows</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">Real-time</span>
+                            <span class="result-label">Processing & Analytics</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-category">
+                    <h3 class="results-title">
+                        <i class="fas fa-globe results-icon"></i>
+                        Global Impact
+                    </h3>
+                    <div class="results-metrics">
+                        <div class="result-metric">
+                            <span class="result-value">$22.3T</span>
+                            <span class="result-label">Global Digital Economy Impact 2030</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">5x</span>
+                            <span class="result-label">Transformation Speed</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">70%</span>
+                            <span class="result-label">Reduced Infrastructure Outages</span>
+                        </div>
+                        <div class="result-metric">
+                            <span class="result-value">Global</span>
+                            <span class="result-label">Enterprise Reach</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Contact Section - Elegant and Functional -->
+    <section id="contact" class="contact-section">
+        <div class="contact-container">
+            <div class="contact-grid">
+                <div class="contact-content">
+                    <h2>Enterprise Digital Excellence Awaits</h2>
+                    <p class="contact-description">
+                        Ready to achieve transformation value with elite <strong>ServiceNow ITSM expertise</strong>, <strong>ServiceNow ITOM consulting</strong> 
+                        and enterprise PMO excellence? Connect with our <strong>enterprise consultants</strong> for a complimentary 
+                        <strong>strategic assessment</strong> and discover how we deliver <strong>2.5x ROI</strong> and competitive advantage through <strong>digital transformation</strong>.
+                    </p>
+                    
+                    <div class="contact-info-grid">
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope" aria-label="Email"></i>
+                            </div>
+                            <div class="contact-info-text">
+                                <h4>Email</h4>
+                                <p>info@digiconsult.ca</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock" aria-label="Response Time"></i>
+                            </div>
+                            <div class="contact-info-text">
+                                <h4>Response Time</h4>
+                                <p>Within 24 hours</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-handshake" aria-label="Consultation"></i>
+                            </div>
+                            <div class="contact-info-text">
+                                <h4>Free Consultation</h4>
+                                <p>Strategic assessment included</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form id="contactForm" action="mailto:ck@digiconsult.ca" method="post" enctype="text/plain">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Name *</label>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="your.email@company.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="company" class="form-label">Company</label>
+                            <input type="text" id="company" name="company" class="form-input" placeholder="Your organization">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="service" class="form-label">Primary Interest *</label>
+                            <select id="service" name="service" class="form-select" required>
+                                <option value="">Select your primary interest</option>
+                                <option value="servicenow-implementation">ServiceNow Enterprise Implementation</option>
+                                <option value="enterprise-pmo">Enterprise PMO Transformation & ITBM</option>
+                                <option value="proprietary-automation">Proprietary Intelligent Automation Platform</option>
+                                <option value="digital-transformation">Complete Enterprise Digital Excellence</option>
+                                <option value="strategic-assessment">Executive Strategic Assessment</option>
+                                <option value="other">Other - Please specify in message</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message *</label>
+                            <textarea id="message" name="message" class="form-textarea" rows="4" placeholder="Tell us about your enterprise transformation needs, current challenges, and objectives. Include any specific ServiceNow modules, PMO requirements, AI infrastructure goals, or integrated transformation objectives you'd like to discuss." required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Request Strategic Consultation
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer - Minimal and Sophisticated -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>DigiConsult</h3>
+                    <p class="footer-description">
+                        Leading ServiceNow implementation specialists and enterprise PMO consultants delivering 
+                        comprehensive digital transformation solutions with AI infrastructure expertise and proven business results worldwide.
+                    </p>
+                    <div class="footer-tagline">
+                        <em>Execution via excellence.</em>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>ServiceNow</h4>
+                    <div class="footer-links">
+                        <a href="#services" class="footer-link">ITSM Implementation</a>
+                        <a href="#services" class="footer-link">ITOM Operations</a>
+                        <a href="#services" class="footer-link">SPM Portfolio</a>
+                        <a href="#services" class="footer-link">Platform Integration</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>PMO Services</h4>
+                    <div class="footer-links">
+                        <a href="#services" class="footer-link">Portfolio Strategy</a>
+                        <a href="#services" class="footer-link">Enterprise PMO</a>
+                        <a href="#services" class="footer-link">SAFe Implementation</a>
+                        <a href="#services" class="footer-link">Agile Transformation</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>AI Solutions</h4>
+                    <div class="footer-links">
+                        <a href="ai-services.html" class="footer-link">AI Services Portal</a>
+                        <a href="ai-services.html#ai-infrastructure" class="footer-link">AI Infrastructure</a>
+                        <a href="ai-services.html#ai-agents" class="footer-link">AI Agents</a>
+                        <a href="ai-services.html#ai-consulting" class="footer-link">AI Consulting</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 DigiConsult Inc. All rights reserved. | ServiceNow Implementation Consulting | Enterprise PMO Excellence</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script-elegant.js"></script>
+</body>
+</html>

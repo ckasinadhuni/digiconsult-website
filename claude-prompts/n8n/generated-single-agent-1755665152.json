@@ -1,0 +1,66 @@
+{
+  "name": "Generated Single Agent - 2025-08-20 04:45",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "@n8n/n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Custom single-agent logic\\nconst workflowType = 'single-agent';\\nconst timestamp = new Date().toISOString();\\n\\nreturn [{\\n  json: {\\n    workflow_type: workflowType,\\n    executed_at: timestamp,\\n    parameters: {\"source\": null, \"target\": null, \"input\": null, \"ai\": null, \"frequency\": null, \"action\": null},\\n    message: `Custom workflow $single-agent executed successfully`\\n  }\\n}];"
+      },
+      "id": "custom-processor",
+      "name": "Process Single Agent",
+      "type": "@n8n/n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process Single Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {},
+  "tags": [
+    "single-agent",
+    "generated",
+    "auto"
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-08-20T04:45:52.163415",
+  "versionId": "1"
+}

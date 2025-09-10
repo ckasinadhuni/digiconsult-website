@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiConsult Authentication Setup - Google & Microsoft OAuth2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3a8a 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            background-color: #f8f9fa;
+            border-left: 4px solid #2c5aa0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #2c5aa0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .code {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .link {
+            color: #2c5aa0;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .important {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .credentials-box {
+            background-color: #e8f4fd;
+            border: 2px solid #2c5aa0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 DigiConsult Authentication Setup</h1>
+            <p>Google & Microsoft OAuth2 Configuration Guide</p>
+        </div>
+
+        <div class="success">
+            <strong>✅ Great News!</strong> Your PocketBase authentication system is now running at <strong>auth2.digiconsult.ca</strong>. 
+            Now we need to set up Google and Microsoft OAuth2 to allow users to login with their social accounts.
+        </div>
+
+        <div class="warning">
+            <strong>⏱️ Time Required:</strong> About 20-25 minutes total (Google: 10 minutes, Microsoft: 15 minutes)
+        </div>
+
+        <h2>🎯 What You'll Accomplish</h2>
+        <ul>
+            <li>Set up Google OAuth2 for Gmail login</li>
+            <li>Set up Microsoft OAuth2 for Outlook/Office 365 login</li>
+            <li>Get the credentials needed for your authentication system</li>
+            <li>Enable social login for DigiConsult users</li>
+        </ul>
+
+        <div class="important">
+            🔒 <strong>IMPORTANT:</strong> Keep your Client IDs and Client Secrets secure! Never share them publicly or store them in code repositories.
+        </div>
+
+        <hr>
+
+        <h2>🟦 PART 1: Google OAuth2 Setup (10 minutes)</h2>
+
+        <div class="step">
+            <h3>Step 1: Access Google Cloud Console</h3>
+            <ol>
+                <li>Open your web browser</li>
+                <li>Go to: <a href="https://console.cloud.google.com/apis/credentials" class="link">https://console.cloud.google.com/apis/credentials</a></li>
+                <li>Sign in with your Google account (use your business email if you have one)</li>
+            </ol>
+            <div class="warning">
+                <strong>New to Google Cloud?</strong> Don't worry! You won't be charged anything. The OAuth2 service is completely free.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Create or Select a Project</h3>
+            <ol>
+                <li>At the top of the page, you'll see a dropdown that might say "Select a project"</li>
+                <li>Click on it and choose "New Project"</li>
+                <li>Project name: <code>DigiConsult Authentication</code></li>
+                <li>Click "Create" and wait about 30 seconds</li>
+                <li>Make sure your new project is selected in the dropdown</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Configure OAuth Consent Screen</h3>
+            <ol>
+                <li>In the left sidebar, click "OAuth consent screen"</li>
+                <li>Choose "External" (this allows anyone with a Google account to login)</li>
+                <li>Click "Create"</li>
+                <li>Fill in the required information:
+                    <ul>
+                        <li><strong>App name:</strong> DigiConsult</li>
+                        <li><strong>User support email:</strong> ck@digiconsult.ca</li>
+                        <li><strong>App domain (optional):</strong> digiconsult.ca</li>
+                        <li><strong>Developer contact info:</strong> ck@digiconsult.ca</li>
+                    </ul>
+                </li>
+                <li>Click "Save and Continue"</li>
+                <li>Skip the "Scopes" section by clicking "Save and Continue"</li>
+                <li>Skip the "Test users" section by clicking "Save and Continue"</li>
+                <li>Review and click "Back to Dashboard"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Create OAuth2 Credentials</h3>
+            <ol>
+                <li>In the left sidebar, click "Credentials"</li>
+                <li>Click "Create Credentials" → "OAuth client ID"</li>
+                <li>Application type: Select "Web application"</li>
+                <li>Name: <code>DigiConsult Web Auth</code></li>
+                <li>Under "Authorized redirect URIs", click "Add URI"</li>
+                <li>Enter exactly: <code>https://auth2.digiconsult.ca/api/oauth2-redirect</code></li>
+                <li>Click "Create"</li>
+            </ol>
+        </div>
+
+        <div class="credentials-box">
+            <h4>📋 SAVE THESE GOOGLE CREDENTIALS:</h4>
+            <p>A popup will appear with your credentials. <strong>Copy and save both of these:</strong></p>
+            <ul>
+                <li><strong>Client ID:</strong> (starts with numbers, ends with .apps.googleusercontent.com)</li>
+                <li><strong>Client Secret:</strong> (random letters and numbers)</li>
+            </ul>
+            <div class="warning">
+                ⚠️ <strong>Important:</strong> If you close this popup, you can always find your Client ID again, but you'll need to create a new Client Secret if you lose it.
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>🔷 PART 2: Microsoft OAuth2 Setup (15 minutes)</h2>
+
+        <div class="step">
+            <h3>Step 1: Access Azure Portal</h3>
+            <ol>
+                <li>Go to: <a href="https://portal.azure.com" class="link">https://portal.azure.com</a></li>
+                <li>Sign in with your Microsoft account</li>
+                <li>If you don't have an Azure account, create a free one (no credit card needed for basic OAuth2)</li>
+            </ol>
+            <div class="warning">
+                <strong>Don't have Azure?</strong> The free tier includes everything we need for authentication. You won't be charged.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Navigate to App Registrations</h3>
+            <ol>
+                <li>In the search bar at the top, type: <code>App registrations</code></li>
+                <li>Click on "App registrations" from the results</li>
+                <li>Click "New registration"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Register Your Application</h3>
+            <ol>
+                <li>Fill in the registration form:
+                    <ul>
+                        <li><strong>Name:</strong> DigiConsult Authentication</li>
+                        <li><strong>Supported account types:</strong> Select "Accounts in any organizational directory and personal Microsoft accounts"</li>
+                        <li><strong>Redirect URI:</strong> 
+                            <ul>
+                                <li>Platform: Web</li>
+                                <li>URL: <code>https://auth2.digiconsult.ca/api/oauth2-redirect</code></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>Click "Register"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Get Your Application ID</h3>
+            <ol>
+                <li>After registration, you'll see your app's overview page</li>
+                <li>Copy the <strong>Application (client) ID</strong> - this is your Microsoft Client ID</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 5: Create Client Secret</h3>
+            <ol>
+                <li>In the left menu, click "Certificates & secrets"</li>
+                <li>Under "Client secrets", click "New client secret"</li>
+                <li>Description: <code>DigiConsult Auth Secret</code></li>
+                <li>Expires: Choose "24 months" (recommended)</li>
+                <li>Click "Add"</li>
+                <li><strong>IMMEDIATELY copy the "Value"</strong> - you cannot see it again!</li>
+            </ol>
+        </div>
+
+        <div class="credentials-box">
+            <h4>📋 SAVE THESE MICROSOFT CREDENTIALS:</h4>
+            <ul>
+                <li><strong>Application (client) ID:</strong> (UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)</li>
+                <li><strong>Client Secret Value:</strong> (random string - copy immediately!)</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>📝 FINAL CHECKLIST</h2>
+
+        <div class="success">
+            <h4>✅ You should now have these 4 pieces of information:</h4>
+            <ol>
+                <li><strong>Google Client ID:</strong> ends with .apps.googleusercontent.com</li>
+                <li><strong>Google Client Secret:</strong> random string from Google</li>
+                <li><strong>Microsoft Client ID:</strong> UUID format</li>
+                <li><strong>Microsoft Client Secret:</strong> random string from Azure</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🚀 Next Steps</h3>
+            <ol>
+                <li><strong>Reply to this email</strong> with all 4 credentials</li>
+                <li>I'll configure them in your PocketBase system</li>
+                <li>We'll test the authentication flows</li>
+                <li>Your users will be able to login with Google/Microsoft!</li>
+            </ol>
+        </div>
+
+        <div class="important">
+            🔒 <strong>SECURITY REMINDER:</strong> 
+            <ul>
+                <li>Never share these credentials publicly</li>
+                <li>Don't commit them to code repositories</li>
+                <li>If you accidentally expose them, regenerate new ones immediately</li>
+                <li>Only share them through secure channels (like this email reply)</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>📞 Need Help?</h2>
+        <div class="warning">
+            <strong>Stuck on any step?</strong> Don't worry! Just:
+            <ul>
+                <li>Take a screenshot of where you're stuck</li>
+                <li>Reply to this email with the screenshot</li>
+                <li>I'll guide you through it step by step</li>
+            </ul>
+        </div>
+
+        <h2>🎯 What Happens Next?</h2>
+        <p>Once you send me the credentials:</p>
+        <ol>
+            <li>I'll configure OAuth2 in your PocketBase system (5 minutes)</li>
+            <li>Test Google login flow</li>
+            <li>Test Microsoft login flow</li>
+            <li>Update your website to use the new authentication</li>
+            <li>Your authentication system will be live!</li>
+        </ol>
+
+        <div class="success">
+            <strong>🎉 Progress Update:</strong> We're 50% complete with the authentication system setup! 
+            Once you complete these OAuth2 setups, we'll have modern social login working for DigiConsult.
+        </div>
+
+        <hr>
+        
+        <div style="text-align: center; color: #666; font-size: 14px; margin-top: 30px;">
+            <p>📧 DigiConsult Authentication Project | auth2.digiconsult.ca</p>
+            <p>🔧 Technical assistance available via email</p>
+        </div>
+    </div>
+</body>
+</html>

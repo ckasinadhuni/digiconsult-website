@@ -1,0 +1,176 @@
+{
+  "name": "AI Agent: Multi-Agent Gatekeeper - 2025-08-20 04:48",
+  "nodes": [
+    {
+      "id": "node-0",
+      "name": "Request Entry",
+      "type": "@n8n/n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/webhook"
+      }
+    },
+    {
+      "id": "node-1",
+      "name": "Request Routing",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "## Current Request\n{{ $json.input || $json.message?.text || $json.query }}\n\n## Additional Context\n- Timestamp: {{ new Date().toISOString() }}\n- Session ID: {{ $workflow.id }}\n- User ID: {{ $json.user_id || 'anonymous' }}\n\n## Context Quality Check\nBefore responding, verify:\n1. Do you have sufficient context to provide a quality response?\n2. Is there any ambiguity that requires clarification?\n3. Are there relevant memories that should influence your response?\n\nProceed with your response using the framework above.",
+        "options": {
+          "systemMessage": "# Supervisor Agent - Context-Aware Assistant\n\n## PRIMARY ROLE & CAPABILITIES\nYou are a Supervisor Agent with the following core competencies:\n- Expert domain knowledge in your specialized area\n- Context-aware reasoning and decision making  \n- Memory-enhanced conversation continuity\n- Structured output generation\n\n## CURRENT TASK CONTEXT\nCoordinate specialist agents using shared context and distributed expertise\n\n## MEMORY & HISTORICAL CONTEXT\nNo previous context available for this session.\n\n## RESPONSE FRAMEWORK\nPlease structure your response as:\n1. **Context Analysis**: Brief assessment of the current situation\n2. **Reasoning**: Your thought process and key considerations  \n3. **Action/Response**: Your specific answer or recommended action\n4. **Next Steps**: Suggested follow-up actions or questions\n\n## CRITICAL CONSTRAINTS\n- Stay within your role boundaries\n- Prioritize accuracy over speed\n- Ask for clarification when context is insufficient\n- Maintain conversation continuity using provided memory\n\nRemember: Quality context engineering leads to better outcomes than clever prompting.",
+          "maxTokens": 6000,
+          "temperature": 0.7,
+          "contextOptimization": true
+        }
+      }
+    },
+    {
+      "id": "node-2",
+      "name": "Agent Selection",
+      "type": "@n8n/n8n-nodes-base.switch",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.type }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      }
+    },
+    {
+      "id": "node-3-0",
+      "name": "Data Specialist",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "agent": "toolsAgent",
+        "promptType": "define",
+        "text": "You are a data_analysis specialist.",
+        "options": {
+          "systemMessage": "Specialize in data_analysis."
+        }
+      }
+    },
+    {
+      "id": "node-3-1",
+      "name": "Content Specialist",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        500
+      ],
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "You are a content_creation specialist.",
+        "options": {
+          "systemMessage": "Specialize in content_creation."
+        }
+      }
+    },
+    {
+      "id": "node-3-2",
+      "name": "Technical Specialist",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [
+        460,
+        500
+      ],
+      "parameters": {
+        "agent": "sqlAgent",
+        "promptType": "define",
+        "text": "You are a database_queries specialist.",
+        "options": {
+          "systemMessage": "Specialize in database_queries."
+        }
+      }
+    },
+    {
+      "id": "node-4",
+      "name": "Shared Context Management",
+      "type": "@n8n/n8n-nodes-base.code",
+      "typeVersion": 1.1,
+      "position": [
+        680,
+        500
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-5",
+      "name": "Agent Coordination Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryZep",
+      "typeVersion": 1.4,
+      "position": [
+        900,
+        500
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "node-6",
+      "name": "Context Aware Response Consolidation",
+      "type": "@n8n/n8n-nodes-base.merge",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        500
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {},
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": {
+      "enabled": true
+    }
+  },
+  "staticData": {},
+  "tags": [
+    "ai-agent",
+    "multi-agent-gatekeeper",
+    "context-engineered",
+    "generated"
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-08-20T04:48:22.148383",
+  "versionId": "1"
+}
