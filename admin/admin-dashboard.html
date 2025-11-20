@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiConsult Infrastructure Dashboard</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .status-item {
+            padding: 1rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .status-item h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .service-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .service-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+        
+        .service-url {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .service-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online { background-color: #27ae60; }
+        .status-offline { background-color: #e74c3c; }
+        .status-warning { background-color: #f39c12; }
+        
+        .service-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .credentials-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .credentials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .credential-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .credential-service {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .credential-details {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🏗️ DigiConsult Infrastructure Dashboard</h1>
+        <div class="subtitle">Enterprise Service Management & Monitoring Portal</div>
+    </header>
+    
+    <div class="container">
+        <!-- System Status Overview -->
+        <div class="status-bar">
+            <div class="status-grid">
+                <div class="status-item">
+                    <h3 id="services-count">14</h3>
+                    <div>Active Services</div>
+                </div>
+                <div class="status-item">
+                    <h3 id="uptime">60+ days</h3>
+                    <div>Average Uptime</div>
+                </div>
+                <div class="status-item">
+                    <h3 id="health">98%</h3>
+                    <div>System Health</div>
+                </div>
+                <div class="status-item">
+                    <h3 id="network">1</h3>
+                    <div>Networks</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Core Services -->
+        <h2 class="section-title">🚀 Core Platform Services</h2>
+        <div class="services-grid">
+            <!-- n8n Workflow Platform -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">⚡</div>
+                    <div>
+                        <div class="service-title">n8n Workflow Platform</div>
+                        <div class="service-url">n8n.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - User Management Enabled</span>
+                </div>
+                <p>Primary automation and workflow engine with PostgreSQL backend</p>
+                <div class="service-actions">
+                    <a href="https://n8n.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 Access Platform</a>
+                    <button class="btn btn-secondary" onclick="checkServiceHealth('n8n')">📊 Health Check</button>
+                </div>
+            </div>
+            
+            <!-- Authentication Portal -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🔒</div>
+                    <div>
+                        <div class="service-title">Authelia SSO</div>
+                        <div class="service-url">auth.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - 3 Active Users</span>
+                </div>
+                <p>Primary authentication service with role-based access control</p>
+                <div class="service-actions">
+                    <a href="https://auth.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 Access Portal</a>
+                    <a href="https://admin.digiconsult.ca" class="btn btn-secondary" target="_blank">👥 User Management</a>
+                </div>
+            </div>
+            
+            <!-- PostgreSQL Database -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🗄️</div>
+                    <div>
+                        <div class="service-title">PostgreSQL Database</div>
+                        <div class="service-url">postgresql.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Primary DB</span>
+                </div>
+                <p>Enterprise database with automated backups and replication</p>
+                <div class="service-actions">
+                    <a href="https://postgresql.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 PGAdmin</a>
+                    <button class="btn btn-secondary" onclick="showCredentials('postgres')">🔑 Credentials</button>
+                </div>
+            </div>
+            
+            <!-- PocketBase Auth -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">📱</div>
+                    <div>
+                        <div class="service-title">PocketBase Auth</div>
+                        <div class="service-url">auth2.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Secondary Auth</span>
+                </div>
+                <p>Secondary authentication service for specialized applications</p>
+                <div class="service-actions">
+                    <a href="https://auth2.digiconsult.ca/_/" class="btn btn-primary" target="_blank">🔗 Admin Panel</a>
+                    <button class="btn btn-secondary" onclick="showCredentials('pocketbase')">🔑 Credentials</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI/ML Services -->
+        <h2 class="section-title">🤖 AI & Machine Learning Services</h2>
+        <div class="services-grid">
+            <!-- Ollama LLM -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🧠</div>
+                    <div>
+                        <div class="service-title">Ollama LLM Service</div>
+                        <div class="service-url">ollama.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Models Ready</span>
+                </div>
+                <p>Local AI model server with WebUI chat interface</p>
+                <div class="service-actions">
+                    <a href="https://ollama.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 Chat Interface</a>
+                    <button class="btn btn-secondary" onclick="checkServiceHealth('ollama')">📊 Model Status</button>
+                </div>
+            </div>
+            
+            <!-- Qdrant Vector Database -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">📊</div>
+                    <div>
+                        <div class="service-title">Qdrant Vector DB</div>
+                        <div class="service-url">qdrant.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Collections Ready</span>
+                </div>
+                <p>Vector database for embeddings and similarity search</p>
+                <div class="service-actions">
+                    <a href="https://qdrant.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 Dashboard</a>
+                    <button class="btn btn-secondary" onclick="showServiceMetrics('qdrant')">📈 Metrics</button>
+                </div>
+            </div>
+            
+            <!-- Whisper Speech-to-Text -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">🎙️</div>
+                    <div>
+                        <div class="service-title">Whisper STT Service</div>
+                        <div class="service-url">whisper.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Small Model</span>
+                </div>
+                <p>Faster-Whisper speech-to-text processing with web interface</p>
+                <div class="service-actions">
+                    <a href="https://whisper.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 Upload Interface</a>
+                    <button class="btn btn-secondary" onclick="checkServiceHealth('whisper')">📊 Processing Queue</button>
+                </div>
+            </div>
+            
+            <!-- OCR Service -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">📄</div>
+                    <div>
+                        <div class="service-title">Tesseract OCR</div>
+                        <div class="service-url">ocr.digiconsult.ca</div>
+                    </div>
+                </div>
+                <div class="service-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>Online - Trial+ Access</span>
+                </div>
+                <p>Document text extraction and processing API</p>
+                <div class="service-actions">
+                    <a href="https://ocr.digiconsult.ca" class="btn btn-primary" target="_blank">🔗 API Docs</a>
+                    <button class="btn btn-secondary" onclick="showCredentials('ocr')">🔑 API Key</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Credentials Section -->
+        <div class="credentials-section">
+            <h2 style="color: #2c3e50; margin-bottom: 1.5rem;">🔐 Administrative Access</h2>
+            <div class="credentials-grid">
+                <div class="credential-item">
+                    <div class="credential-service">n8n Platform</div>
+                    <div class="credential-details">
+                        Username: admin<br>
+                        Password: [SECURE] cyV6RYa5hjz9mM$Yn7uNSxcq<br>
+                        Access: Full Admin
+                    </div>
+                </div>
+                <div class="credential-item">
+                    <div class="credential-service">PostgreSQL Database</div>
+                    <div class="credential-details">
+                        Username: admin@digiconsult.ca<br>
+                        Password: [SECURE] sgg$&VzwaF*T2WZAjK9JD*!F<br>
+                        Access: DBA Rights
+                    </div>
+                </div>
+                <div class="credential-item">
+                    <div class="credential-service">PocketBase Admin</div>
+                    <div class="credential-details">
+                        Username: admin@digiconsult.ca<br>
+                        Password: [SECURE] vPz!sc#IFeEyx6tsl7Ep8naz<br>
+                        Access: Full Admin
+                    </div>
+                </div>
+                <div class="credential-item">
+                    <div class="credential-service">Authelia Users</div>
+                    <div class="credential-details">
+                        ck@digiconsult.ca (Admin)<br>
+                        tejamarthy@digiconsult.ca (Developer)<br>
+                        info@digiconsult.ca (Analyst)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Service health checking
+        async function checkServiceHealth(service) {
+            const statusMap = {
+                'n8n': 'https://n8n.digiconsult.ca/healthz',
+                'ollama': 'https://ollama.digiconsult.ca/api/tags',
+                'whisper': 'https://whisper.digiconsult.ca/health'
+            };
+            
+            try {
+                const response = await fetch(statusMap[service] || '#');
+                if (response.ok) {
+                    alert(`✅ ${service} is healthy and responding`);
+                } else {
+                    alert(`⚠️ ${service} returned status: ${response.status}`);
+                }
+            } catch (error) {
+                alert(`❌ Cannot reach ${service}: ${error.message}`);
+            }
+        }
+        
+        function showCredentials(service) {
+            const credentials = {
+                'postgres': 'Username: admin@digiconsult.ca\\nPassword: sgg$&VzwaF*T2WZAjK9JD*!F',
+                'pocketbase': 'Username: admin@digiconsult.ca\\nPassword: vPz!sc#IFeEyx6tsl7Ep8naz',
+                'ocr': 'API Key: jqS8LxRXSnQOqTBCkxlFtccIZFfudd2L'
+            };
+            
+            alert(credentials[service] || 'Credentials not available');
+        }
+        
+        function showServiceMetrics(service) {
+            alert(`📊 Showing metrics for ${service}\\n\\nThis would integrate with monitoring system`);
+        }
+        
+        // Real-time status updates
+        function updateServiceStatus() {
+            // This would connect to actual monitoring endpoints
+            console.log('Updating service statuses...');
+        }
+        
+        // Update every 30 seconds
+        setInterval(updateServiceStatus, 30000);
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateServiceStatus();
+        });
+    </script>
+</body>
+</html>

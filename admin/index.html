@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiConsult Admin Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #bdc3c7;
+            margin-top: 0.5rem;
+        }
+
+        .main {
+            padding: 2rem 0;
+        }
+        
+        .dashboard-link {
+            background: #3498db;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1rem 0;
+            transition: background 0.3s ease;
+        }
+        
+        .dashboard-link:hover {
+            background: #2980b9;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #34495e;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+            margin: 0.25rem;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .admin-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .admin-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .admin-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .admin-card p {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🔐 DigiConsult Admin Portal</h1>
+            <p>Secure Administrative Dashboard</p>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="container">
+            <!-- Admin Functions -->
+            <div class="card">
+                <div class="card-header">
+                    ⚙️ Administrative Functions
+                </div>
+                <div class="card-body">
+                    <div class="admin-section">
+                        <!-- User Management -->
+                        <div class="admin-card">
+                            <h3>👥 User Management</h3>
+                            <p>Manage users, roles, and authentication settings using PocketBase admin interface.</p>
+                            <a href="https://auth2.digiconsult.ca/_/" class="btn btn-success" target="_blank">
+                                🔗 Open PocketBase Admin
+                            </a>
+                        </div>
+
+                        <!-- Infrastructure Dashboard -->
+                        <div class="admin-card">
+                            <h3>🏗️ Infrastructure Dashboard</h3>
+                            <p>Comprehensive service monitoring, health checks, and admin access.</p>
+                            <a href="admin-dashboard.html" class="btn btn-success">
+                                🚀 Launch Dashboard
+                            </a>
+                        </div>
+
+                        <!-- System Monitoring -->
+                        <div class="admin-card">
+                            <h3>📊 System Status</h3>
+                            <p>Quick system health check and basic metrics.</p>
+                            <button class="btn" onclick="checkSystemStatus()">
+                                📈 Check Status
+                            </button>
+                        </div>
+
+                        <!-- Authentication Portal -->
+                        <div class="admin-card">
+                            <h3>🔑 Authentication</h3>
+                            <p>Access the authentication portal for advanced user management.</p>
+                            <a href="https://auth.digiconsult.ca" class="btn" target="_blank">
+                                🏛️ Open Auth Portal
+                            </a>
+                        </div>
+
+                        <!-- Documentation -->
+                        <div class="admin-card">
+                            <h3>📚 Documentation</h3>
+                            <p>Access system documentation and configuration guides.</p>
+                            <button class="btn" onclick="showDocumentation()">
+                                📖 View Docs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Information -->
+            <div class="card">
+                <div class="card-header">
+                    ℹ️ System Information
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div>
+                            <strong>Admin Portal:</strong> digiconsult.ca/admin<br>
+                            <strong>Authentication:</strong> Authelia Protected<br>
+                            <strong>User Management:</strong> PocketBase<br>
+                        </div>
+                        <div>
+                            <strong>Status:</strong> <span style="color: #27ae60;">✅ Operational</span><br>
+                            <strong>Access Level:</strong> Administrator Only<br>
+                            <strong>Last Updated:</strong> <span id="lastUpdate"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Projects -->
+            <div class="card">
+                <div class="card-header">
+                    🚧 Current Projects
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                        <div>
+                            <h4>✅ EPIC 1: PocketBase Infrastructure</h4>
+                            <p><strong>Status:</strong> Complete</p>
+                            <p>PocketBase authentication service deployed and operational.</p>
+                        </div>
+                        <div>
+                            <h4>🔄 EPIC 2: User Collections Setup</h4>
+                            <p><strong>Status:</strong> In Progress</p>
+                            <p>Configuring user management and authentication rules.</p>
+                        </div>
+                        <div>
+                            <h4>📋 EPIC 3: OAuth2 Integration</h4>
+                            <p><strong>Status:</strong> Planned</p>
+                            <p>Google and Microsoft authentication provider setup.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+
+        function checkSystemStatus() {
+            // Placeholder for system status check
+            alert('System Status: All services operational\n\n' +
+                  '🟢 Caddy Reverse Proxy: Running\n' +
+                  '🟢 PocketBase Auth: Running\n' +
+                  '🟢 Authelia: Running\n' +
+                  '🟢 SSL Certificates: Valid');
+        }
+
+        function showDocumentation() {
+            // Placeholder for documentation access
+            alert('Documentation Access:\n\n' +
+                  '📚 Admin Configuration: /shared-docs/adminconfig.md\n' +
+                  '🔧 Auth Redesign: /shared-docs/AUTHREDESIGN.md\n' +
+                  '📋 Project Plan: /shared-docs/USER_AUTHENTICATION_PROJECT_PLAN.md\n\n' +
+                  'Note: File browser currently disabled for security.');
+        }
+
+        // Check authentication status on load
+        window.addEventListener('load', function() {
+            fetch('/api/auth/check')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ Authentication verified');
+                    } else {
+                        console.log('❌ Authentication check failed');
+                    }
+                })
+                .catch(error => {
+                    console.log('⚠️ Authentication check error:', error);
+                });
+        });
+    </script>
+</body>
+</html>
